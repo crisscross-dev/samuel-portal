@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SCC - HWSU Portal</title>
+    <title>SCC Portal</title>
     <link rel="icon" type="image/png" href="{{ asset('images/scc_logo.png') }}">
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     @vite([
-        'resources/css/app.css',
-        'resources/css/index.css',
+    'resources/css/app.css',
+    'resources/css/index.css',
     ])
 
     <style>
@@ -39,6 +40,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container py-3">
 
@@ -55,28 +57,36 @@
             <div class="clinic-logo">
                 <img src="{{ asset('images/scc_logo.png') }}" alt="SCC Logo" />
             </div>
-            <h1>Samuel Christian College</h1>
-            <h2>Health and Wellness Services Unit</h2>
+            <h1>Samuel Christian College General Trias Inc.</h1>
+            <h2>Student Portal</h2>
             <br>
-            <p>Professional Healthcare Services</p>
-            <p>Your Health, Our Priority</p>
+            <p>School Management System</p>
+            <p>Your Education, Our Commitment</p>
         </div>
 
         @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="fas fa-check-circle me-1"></i> {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-1"></i> {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
         @endif
 
         <!-- CTA Section -->
         <div class="cta-section">
             <div class="cta-content">
-                <h2 class="cta-title">Student Health Services</h2>
+                <h2 class="cta-title">Welcome to SCC Portal</h2>
                 <p class="cta-subtitle">
-                    Log in to manage your health information and stay updated on available services.
+                    Access your enrollment, grades, applications, and student information all in one place.
                 </p>
                 <div class="cta-buttons">
+                    <a href="{{ route('admission.apply') }}" class="btn-cta btn-primary-cta">
+                        <i class="fas fa-pen-to-square"></i>
+                        Apply for Admission
+                    </a>
+                    <a href="{{ route('admission.track') }}" class="btn-cta btn-secondary-cta">
+                        <i class="fas fa-magnifying-glass"></i>
+                        Track Your Application
+                    </a>
                     <a href="#services" onclick="scrollToServices()" class="btn-cta btn-secondary-cta">
                         <i class="fas fa-info-circle"></i>
                         Learn About Our Services
@@ -88,8 +98,8 @@
         <!-- Feature Badges -->
         <div class="features-row">
             <div class="feature-badge">
-                <i class="fas fa-shield-heart"></i>
-                <span>Trusted Care</span>
+                <i class="fas fa-graduation-cap"></i>
+                <span>Quality Education</span>
             </div>
             <div class="feature-badge">
                 <i class="fas fa-lock"></i>
@@ -97,7 +107,7 @@
             </div>
             <div class="feature-badge">
                 <i class="fas fa-bolt"></i>
-                <span>Fast Service</span>
+                <span>Fast Access</span>
             </div>
         </div>
 
@@ -172,12 +182,15 @@
     </div><!-- end .container -->
 
     @vite([
-        'resources/js/app.js',
-        'resources/js/index.js',
+    'resources/js/app.js',
+    'resources/js/index.js',
     ])
 
     @if(session('success'))
-        <script>window.showFormOnLoad = true;</script>
+    <script>
+        window.showFormOnLoad = true;
+    </script>
     @endif
 </body>
+
 </html>

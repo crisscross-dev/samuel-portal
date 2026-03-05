@@ -35,8 +35,9 @@ class DatabaseSeeder extends Seeder
         $admin = User::firstOrCreate(
             ['email' => 'admin@scc.edu.ph'],
             [
-                'name'     => 'System Administrator',
-                'password' => 'password',
+                'name'      => 'System Administrator',
+                'password'  => 'password',
+                'is_active' => true,
             ]
         );
         $admin->assignRole('admin');
@@ -45,8 +46,9 @@ class DatabaseSeeder extends Seeder
         $registrar = User::firstOrCreate(
             ['email' => 'registrar@scc.edu.ph'],
             [
-                'name'     => 'Registrar Staff',
-                'password' => 'password',
+                'name'      => 'Registrar Staff',
+                'password'  => 'password',
+                'is_active' => true,
             ]
         );
         $registrar->assignRole('registrar');
@@ -64,14 +66,16 @@ class DatabaseSeeder extends Seeder
 
         // ── Create Grade Levels ───────────────────────────
         $gradeLevels = [];
-        foreach ([
-            ['department' => $jhsDept, 'name' => 'Grade 7',  'order' => 7],
-            ['department' => $jhsDept, 'name' => 'Grade 8',  'order' => 8],
-            ['department' => $jhsDept, 'name' => 'Grade 9',  'order' => 9],
-            ['department' => $jhsDept, 'name' => 'Grade 10', 'order' => 10],
-            ['department' => $shsDept, 'name' => 'Grade 11', 'order' => 11],
-            ['department' => $shsDept, 'name' => 'Grade 12', 'order' => 12],
-        ] as $gl) {
+        foreach (
+            [
+                ['department' => $jhsDept, 'name' => 'Grade 7',  'order' => 7],
+                ['department' => $jhsDept, 'name' => 'Grade 8',  'order' => 8],
+                ['department' => $jhsDept, 'name' => 'Grade 9',  'order' => 9],
+                ['department' => $jhsDept, 'name' => 'Grade 10', 'order' => 10],
+                ['department' => $shsDept, 'name' => 'Grade 11', 'order' => 11],
+                ['department' => $shsDept, 'name' => 'Grade 12', 'order' => 12],
+            ] as $gl
+        ) {
             $gradeLevels[$gl['name']] = GradeLevel::firstOrCreate(
                 ['department_id' => $gl['department']->id, 'name' => $gl['name']],
                 ['level_order' => $gl['order'], 'is_active' => true]
@@ -82,8 +86,9 @@ class DatabaseSeeder extends Seeder
         $facultyUser = User::firstOrCreate(
             ['email' => 'faculty@scc.edu.ph'],
             [
-                'name'     => 'Prof. Juan Dela Cruz',
-                'password' => 'password',
+                'name'      => 'Prof. Juan Dela Cruz',
+                'password'  => 'password',
+                'is_active' => true,
             ]
         );
         $facultyUser->assignRole('faculty');
@@ -99,8 +104,9 @@ class DatabaseSeeder extends Seeder
         $facultyUser2 = User::firstOrCreate(
             ['email' => 'faculty2@scc.edu.ph'],
             [
-                'name'     => 'Prof. Ana Reyes',
-                'password' => 'password',
+                'name'      => 'Prof. Ana Reyes',
+                'password'  => 'password',
+                'is_active' => true,
             ]
         );
         $facultyUser2->assignRole('faculty');
@@ -121,8 +127,9 @@ class DatabaseSeeder extends Seeder
         $studentUser = User::firstOrCreate(
             ['email' => 'student@scc.edu.ph'],
             [
-                'name'     => 'Maria Santos',
-                'password' => 'password',
+                'name'      => 'Maria Santos',
+                'password'  => 'password',
+                'is_active' => true,
             ]
         );
         $studentUser->assignRole('student');
