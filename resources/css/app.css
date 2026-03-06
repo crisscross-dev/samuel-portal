@@ -1,16 +1,3 @@
-@import 'tailwindcss';
-
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
-
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
-}
-
-
 /* @import "bootstrap/dist/css/bootstrap.min.css";
 @import "bootstrap-icons/font/bootstrap-icons.css";
 @import "litepicker/dist/css/litepicker.css"; */
@@ -18,77 +5,16 @@
 @import "./shared/components.css";
 @import "./shared/buttons.css";
 
-/* Global app styles */
 :root {
     --brand-primary: #1e5799;
-    --brand-accent: #198754; /* Bootstrap success */
+    --brand-accent: #198754;
+    
+    /* Background Colors */
+    --bg-main-content: #fffdfa;      /* Main dashboard */
+    --bg-body: #ffffff;               /* Fallback body */
+    --bg-login: linear-gradient(...); /* Login page */
 }
 
-body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-        "Helvetica Neue", Arial, sans-serif !important;
-}
-
-.main-content {
-    background-color: #f5ede0 !important;
-    /*Light Beige*/
-    padding: 80px 20px 20px 20px !important;
-    margin-left: 240px !important;
-    margin-top: 0px !important;
-    display: block !important;
-    /* let content define height */
-     min-height: 100vh !important;
-    /* ensure full-page height */
-    overflow: visible !important;
-    /* avoid nested scrollbars */
-}
-
-/* Respond to collapsed sidebar: when sidebar is hidden, content takes full width */
-body.collapsed .main-content {
-    margin-left: 0 !important;
-}
-
-.header-bar {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    margin-bottom: 20px !important;
-    padding-bottom: 15px !important;
-    border-bottom: 1px solid #e0e0e0 !important;
-}
-
-.main-header {
-    margin-right: 20px;
-    font-weight: 600;
-    color: #1e5799;
-    border-bottom: 4px solid #207cca;
-}
-
-.main-header {
-    background: #f8f9fa;
-    border-bottom: 1px solid #e9ecef;
-    padding: 0.75rem 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.container {
-    padding-top: 1rem;
-}
-
-.table th {
-    /* prevent header wrap */
-    white-space: nowrap;
-}
-
-.btn-primary {
-    background-color: var(--brand-primary);
-    border-color: var(--brand-primary);
-}
-.btn-primary:hover {
-    filter: brightness(0.95);
-}
 
 /* SweetAlert2-like modal animation */
 @keyframes sweetPop {

@@ -1,29 +1,166 @@
- /* Patient Portal Specific Styles */
+/* Patient Portal Specific Styles */
 
 /* Header Styles */
 .header {
     text-align: center;
     color: white;
-
 }
 
 .topbar {
     display: flex;
     justify-content: flex-end;
-    gap: 0.5rem;
+    align-items: center;
+    gap: 0.75rem;
 }
-.card{
+
+/* ── Topbar Navigation ───────────────────────────────── */
+.topbar-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-right: auto;
+}
+
+.nav-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.45rem 0.85rem;
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+    font-size: 0.9rem;
+    text-decoration: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+    position: relative;
+}
+
+.nav-item:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+}
+
+.nav-item.active {
+    color: #fff;
+    font-weight: 600;
+}
+
+.nav-item.active::after {
+    content: "";
+    position: absolute;
+    bottom: 2px;
+    left: 0.85rem;
+    right: 0.85rem;
+    height: 2px;
+    background: #fff;
+    border-radius: 2px;
+}
+
+/* ── Dropdown ─────────────────────────────────────────── */
+.nav-dropdown {
+    position: relative;
+}
+
+.nav-dropdown-toggle .nav-chevron {
+    font-size: 0.65rem;
+    transition: transform 0.2s ease;
+}
+
+.nav-dropdown.open .nav-chevron {
+    transform: rotate(180deg);
+}
+
+.nav-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    min-width: 200px;
+    background: rgba(255, 255, 255, 0.97);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    z-index: 100;
+    overflow: hidden;
+    animation: dropdownFadeIn 0.15s ease;
+}
+
+@keyframes dropdownFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.nav-dropdown.open .nav-dropdown-menu {
+    display: block;
+}
+
+.nav-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.65rem 1rem;
+    color: #1e3a5f;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background 0.15s ease;
+}
+
+.nav-dropdown-item:hover {
+    background: #f0f6ff;
+    color: #1e5799;
+}
+
+.nav-dropdown-item i {
+    width: 16px;
+    color: #1e5799;
+    font-size: 0.8rem;
+}
+
+.nav-dropdown-group-label {
+    padding: 0.55rem 1rem 0.3rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #7a9cc0;
+    pointer-events: none;
+}
+
+.nav-dropdown-divider {
+    height: 1px;
+    background: rgba(0, 0, 0, 0.07);
+    margin: 0.35rem 0;
+}
+
+/* Make the More dropdown wider for its grouped content */
+.nav-dropdown:last-of-type .nav-dropdown-menu {
+    min-width: 240px;
+}
+.card {
     background-color: #f5ede0;
 }
 .card-header {
     background-color: #c9ddf0; /* Light blue */
     font-weight: 600;
 }
-.accordion-collapse{
-    background-color: #f5ede0
+.accordion-collapse {
+    background-color: #f5ede0;
 }
 
-.form-control, .form-select {
+.form-control,
+.form-select {
     background-color: #f1f3f6;
     color: #333;
     box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
@@ -43,7 +180,9 @@
     text-decoration: none;
     font-weight: 600;
     font-size: clamp(0.85rem, 1.2vw, 0.95rem);
-    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    transition:
+        background-color 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
 .login-btn:hover {
@@ -150,13 +289,20 @@
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        filter 0.2s ease;
     cursor: pointer;
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
 }
 
 .btn-primary-cta {
-    background: linear-gradient(135deg, #4fc3f7 0%, #03a9f4 100%); /* light sky blue */
+    background: linear-gradient(
+        135deg,
+        #4fc3f7 0%,
+        #03a9f4 100%
+    ); /* light sky blue */
     color: #fff;
     border: none;
     font-weight: 600;
@@ -166,10 +312,13 @@
 }
 
 .btn-primary-cta:hover {
-    background: linear-gradient(135deg, #29b6f6 0%, #0288d1 100%); /* slightly deeper on hover */
+    background: linear-gradient(
+        135deg,
+        #29b6f6 0%,
+        #0288d1 100%
+    ); /* slightly deeper on hover */
     transform: translateY(-2px);
 }
-
 
 .btn-secondary-cta {
     background: rgba(255, 255, 255, 0.1);
@@ -302,7 +451,6 @@
         gap: 0.5rem;
     }
 }
-
 
 .btn-blue {
     background: linear-gradient(to bottom right, #1e5799, #207cca);

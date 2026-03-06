@@ -1,7 +1,7 @@
 /* ─── Sidebar Layout ─────────────────────────────────── */
 :root {
     --sidebar-width: 260px;
-    --primary-color: #1a3a5c;
+    --primary-color: linear-gradient(to bottom right, #1e5799, #207cca);
     --accent-color: #2c7be5;
 }
 
@@ -17,6 +17,8 @@ body {
     bottom: 0;
     width: var(--sidebar-width);
     background: var(--primary-color);
+    /* background: linear-gradient(to bottom right, #1e5799, #207cca); */
+
     color: #fff;
     z-index: 1030;
     overflow-y: auto;

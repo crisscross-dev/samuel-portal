@@ -27,7 +27,13 @@ use Illuminate\Support\Facades\Route;
 
 // ─── Public / Auth ────────────────────────────────────────────────
 
-Route::get('/', fn () => view('welcome'))->name('home');
+Route::get('/', fn() => view('welcome'))->name('home');
+
+// ─── Landing Pages ────────────────────────────────────────────────
+
+Route::get('/junior-high-school', fn() => view('landingpage.jhs'))->name('landing.jhs');
+Route::get('/senior-high-school', fn() => view('landingpage.shs'))->name('landing.shs');
+Route::get('/college', fn() => view('landingpage.college'))->name('landing.college');
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
