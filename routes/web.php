@@ -35,6 +35,21 @@ Route::get('/junior-high-school', fn() => view('landingpage.jhs'))->name('landin
 Route::get('/senior-high-school', fn() => view('landingpage.shs'))->name('landing.shs');
 Route::get('/college', fn() => view('landingpage.college'))->name('landing.college');
 
+Route::get('/school-admin', fn() => view('landingpage.school_admin'))->name('landing.school_admin');
+Route::get('/aass-admin', fn() => view('landingpage.aass_admin'))->name('landing.aass_admin');
+Route::get('/sas-admin', fn() => view('landingpage.sas_admin'))->name('landing.sas_admin');
+Route::get('/hed-admin', fn() => view('landingpage.hed_admin'))->name('landing.hed_admin');
+Route::get('/bed-admin', fn() => view('landingpage.bed_admin'))->name('landing.bed_admin');
+
+Route::get('/school-profile', fn() => view('landingpage.about_us.school_profile'))->name('landing.school_profile');
+Route::get('/vision-mission', fn() => view('landingpage.about_us.vision_mission'))->name('landing.vision_mission');
+Route::get('/core-values-goals', fn() => view('landingpage.about_us.core_values_goals'))->name('landing.core_values_goals');
+Route::get('/educational-philosophy', fn() => view('landingpage.about_us.educational_philosophy'))->name('landing.educational_philosophy');
+Route::get('/clubs', fn() => view('landingpage.about_us.clubs'))->name('landing.clubs');
+Route::get('/virtual-tour', fn() => view('landingpage.about_us.virtual_tour'))->name('landing.virtual_tour');
+
+Route::get('/contact-us', fn() => view('landingpage.about_us.contact_us'))->name('landing.contact_us');
+
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
@@ -44,6 +59,8 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->midd
 Route::prefix('admission')->name('admission.')->group(function () {
     Route::get('/apply',   [AdmissionController::class, 'create'])->name('apply');
     Route::post('/apply',  [AdmissionController::class, 'store'])->name('store');
+    Route::get('/jhs',     [AdmissionController::class, 'jhsForm'])->name('jhs');
+    Route::post('/jhs',    [AdmissionController::class, 'storeJhs'])->name('jhs.store');
     Route::get('/success', [AdmissionController::class, 'success'])->name('success');
     Route::get('/track',   [AdmissionController::class, 'track'])->name('track');
     Route::post('/track',  [AdmissionController::class, 'trackSearch'])->name('track.search');

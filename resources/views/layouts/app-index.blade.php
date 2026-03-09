@@ -97,19 +97,19 @@
                     <div class="nav-dropdown-menu nav-dropdown-menu--wide">
 
                         <div class="nav-dropdown-group-label">School Officials</div>
-                        <a href="#" class="nav-dropdown-item">
+                        <a href="{{ route('landing.school_admin') }}" class="nav-dropdown-item">
                             <i class="fas fa-user-tie"></i> School Administrators
                         </a>
-                        <a href="#" class="nav-dropdown-item">
+                        <a href="{{ route('landing.aass_admin') }}" class="nav-dropdown-item">
                             <i class="fas fa-users"></i> AASS Admin &amp; Staffs
                         </a>
-                        <a href="#" class="nav-dropdown-item">
+                        <a href="{{ route('landing.sas_admin') }}" class="nav-dropdown-item">
                             <i class="fas fa-users"></i> SAS Admin &amp; Staffs
                         </a>
-                        <a href="#" class="nav-dropdown-item">
+                        <a href="{{ route('landing.hed_admin') }}" class="nav-dropdown-item">
                             <i class="fas fa-users"></i> HED Admin &amp; Staffs
                         </a>
-                        <a href="#" class="nav-dropdown-item">
+                        <a href="{{ route('landing.bed_admin') }}" class="nav-dropdown-item">
                             <i class="fas fa-users"></i> BED Admin &amp; Staffs
                         </a>
                     </div>
@@ -123,28 +123,28 @@
                     <div class="nav-dropdown-menu nav-dropdown-menu--wide">
 
                         <div class="nav-dropdown-group-label">About Us</div>
-                        <a href="#" class="nav-dropdown-item">
+                        <a href="{{ route('landing.school_profile') }}" class="nav-dropdown-item">
                             <i class="fas fa-school"></i> School Profile
                         </a>
-                        <a href="#" class="nav-dropdown-item">
+                        <a href="{{ route('landing.vision_mission') }}" class="nav-dropdown-item">
                             <i class="fas fa-eye"></i> Vision &amp; Mission
                         </a>
-                        <a href="#" class="nav-dropdown-item">
+                        <a href="{{ route('landing.core_values_goals') }}" class="nav-dropdown-item">
                             <i class="fas fa-star"></i> Core Values &amp; Goals
                         </a>
-                        <a href="#" class="nav-dropdown-item">
+                        <a href="{{ route('landing.educational_philosophy') }}" class="nav-dropdown-item">
                             <i class="fas fa-book-open"></i> Educational Philosophy
                         </a>
-                        <a href="#" class="nav-dropdown-item">
+                        <a href="{{ route('landing.clubs') }}" class="nav-dropdown-item">
                             <i class="fas fa-people-group"></i> Clubs &amp; Organizations
                         </a>
-                        <a href="#" class="nav-dropdown-item">
+                        <a href="{{ route('landing.virtual_tour') }}" class="nav-dropdown-item">
                             <i class="fas fa-map"></i> Virtual Tour
                         </a>
 
                         <div class="nav-dropdown-divider"></div>
 
-                        <a href="#" class="nav-dropdown-item">
+                        <a href="{{ route('landing.contact_us') }}" class="nav-dropdown-item">
                             <i class="fas fa-envelope"></i> Contact Us
                         </a>
 
@@ -168,10 +168,10 @@
                 <img src="{{ asset('images/scc_logo.png') }}" alt="SCC Logo" />
             </div>
             <h1>Samuel Christian College General Trias Inc.</h1>
-            <h2>Student Portal</h2>
+            <!-- <h2>Student Portal</h2>
             <br>
             <p>School Management System</p>
-            <p>Your Education, Our Commitment</p>
+            <p>Your Education, Our Commitment</p> -->
         </div>
 
         @if(session('success'))

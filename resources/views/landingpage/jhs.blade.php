@@ -384,7 +384,7 @@
             <h2>High School<br><span>Enrolment</span></h2>
             <div class="grade-badge"><i class="fas fa-graduation-cap me-1"></i> Grade 7 to 10</div>
             <br>
-            <a href="{{ route('admission.apply') }}" class="jhs-enrol-btn">
+            <a href="{{ route('admission.jhs') }}" class="jhs-enrol-btn">
                 <i class="fas fa-pen-to-square"></i> Enroll Now
             </a>
         </div>
@@ -459,7 +459,7 @@
                 Guided by Christian values and a commitment to academic excellence, SCC continuously
                 evolves its programs to meet the demands of the 21st Century learner.
             </p>
-            <a href="{{ route('admission.apply') }}" class="jhs-enrol-btn mt-3 d-inline-flex">
+            <a href="{{ route('admission.jhs') }}" class="jhs-enrol-btn mt-3 d-inline-flex">
                 <i class="fas fa-pen-to-square"></i> Apply Now
             </a>
         </div>
@@ -529,7 +529,7 @@
             Start your application today and be part of the Samuelian family.
         </p>
         <div class="d-flex gap-3 justify-content-center flex-wrap">
-            <a href="{{ route('admission.apply') }}" class="jhs-enrol-btn">
+            <a href="{{ route('admission.jhs') }}" class="jhs-enrol-btn">
                 <i class="fas fa-pen-to-square"></i> Apply for Admission
             </a>
             <a href="{{ route('admission.track') }}" class="jhs-enrol-btn" style="background:transparent; border:2px solid #f1c40f; color:#f1c40f; box-shadow:none;">

@@ -12,13 +12,15 @@
             Access your enrollment, grades, applications, and student information all in one place.
         </p>
         <div class="cta-buttons">
-            <a href="{{ route('admission.apply') }}" class="btn-cta btn-primary-cta">
+            <a href="#" class="btn-cta btn-primary-cta">
                 <i class="fas fa-pen-to-square"></i>
                 Apply for Admission
+                <!-- {{ route('admission.apply') }} -->
             </a>
-            <a href="{{ route('admission.track') }}" class="btn-cta btn-secondary-cta">
+            <a href="#" class="btn-cta btn-secondary-cta">
                 <i class="fas fa-magnifying-glass"></i>
                 Track Your Application
+                <!-- {{ route('admission.track') }} -->
             </a>
             <a href="#services" onclick="scrollToServices()" class="btn-cta btn-secondary-cta">
                 <i class="fas fa-info-circle"></i>
