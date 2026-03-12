@@ -80,19 +80,23 @@
     /* Admin Leadership */
     .admin-leadership {
         display: flex;
-        flex-direction: column;
-        gap: 1.25rem;
+        flex-direction: row;
+        justify-content: center;
+        gap: 3rem;
         padding: 0.5rem 0;
+        flex-wrap: wrap;
     }
 
     .admin-leadership-row {
         display: flex;
+        flex-direction: column;
         align-items: center;
         gap: 0.75rem;
+        text-align: center;
     }
 
     .admin-leadership-row.right {
-        flex-direction: row-reverse;
+        flex-direction: column;
     }
 
     .admin-leadership-row img {
@@ -103,6 +107,9 @@
         object-position: top;
         box-shadow: 0 6px 24px rgba(30, 58, 95, 0.15);
         flex-shrink: 0;
+        background: linear-gradient(to bottom,
+                rgba(242, 243, 245, 0.95),
+                rgba(242, 243, 245, 0.70));
     }
 
     .admin-leadership-text .admin-name {
@@ -115,7 +122,7 @@
     .admin-leadership-text .admin-role {
         font-size: 0.85rem;
         color: #d9dbdf;
-        text-align: left;
+        text-align: center;
     }
 
     /* Admin Grid */
@@ -127,15 +134,9 @@
     }
 
     @media (max-width: 600px) {
-
-        .admin-leadership-row,
-        .admin-leadership-row.right {
+        .admin-leadership {
             flex-direction: column;
-            text-align: center;
-        }
-
-        .admin-leadership-text .admin-role {
-            text-align: center;
+            align-items: center;
         }
 
         .admin-leadership-row img {

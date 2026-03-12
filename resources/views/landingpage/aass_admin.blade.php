@@ -84,6 +84,10 @@
         object-fit: cover;
         object-position: top;
         flex-shrink: 0;
+        background: linear-gradient(to bottom,
+                rgba(242, 243, 245, 0.95),
+                rgba(242, 243, 245, 0.70));
+        border-radius: 12px;
     }
 
     .admin-leadership-text .admin-name {
@@ -107,6 +111,7 @@
         flex-direction: column;
         align-items: center;
         text-align: center;
+
     }
 
     .admin-card img,
@@ -119,6 +124,7 @@
         border: 3px solid #e2e8f0;
         box-shadow: 0 4px 14px rgba(30, 58, 95, 0.12);
         margin-bottom: 0.75rem;
+        background: #f0f4f8;
     }
 
     .admin-photo-placeholder {

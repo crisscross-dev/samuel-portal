@@ -84,6 +84,10 @@
         object-fit: cover;
         object-position: top;
         flex-shrink: 0;
+        background: linear-gradient(to bottom,
+                rgba(242, 243, 245, 0.95),
+                rgba(242, 243, 245, 0.70));
+        border-radius: 12px;
     }
 
     .admin-leadership-text .admin-name {
@@ -220,7 +224,8 @@
 
     <!-- OIC (text-only, centered) -->
     <div style="text-align:center; padding: 0.5rem 0 1.5rem;">
-        <div class="admin-card-text" style="display:inline-flex;">
+        <div class="admin-card">
+            <div class="admin-photo-placeholder"><i class="fas fa-user"></i></div>
             <div class="admin-name">Mr. Roland C. Helmo</div>
             <div class="admin-role">Officer In-Charge, Academic Affairs Unit</div>
         </div>
@@ -228,27 +233,33 @@
 
     <!-- Department Heads & Program Leaders -->
     <div class="admin-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
-        <div class="admin-card-text">
+        <div class="admin-card">
+            <div class="admin-photo-placeholder"><i class="fas fa-user"></i></div>
             <div class="admin-name">Dr. Catherine O. Aquino, CPA</div>
             <div class="admin-role">Department Head, Department of Accountancy<br>Program Leader, BS Accountancy and BS Management Accounting</div>
         </div>
-        <div class="admin-card-text">
+        <div class="admin-card">
+            <div class="admin-photo-placeholder"><i class="fas fa-user"></i></div>
             <div class="admin-name">Mr. Roland C. Helmo</div>
             <div class="admin-role">Department Head, Department of Business and Management Studies<br>Program Leader, BS Office Administration</div>
         </div>
-        <div class="admin-card-text">
+        <div class="admin-card">
+            <div class="admin-photo-placeholder"><i class="fas fa-user"></i></div>
             <div class="admin-name">Engr. Daniel A. Villanueva, CCPE, MEP</div>
             <div class="admin-role">Department Head, Department of Engineering</div>
         </div>
-        <div class="admin-card-text">
+        <div class="admin-card">
+            <div class="admin-photo-placeholder"><i class="fas fa-user"></i></div>
             <div class="admin-name">Mr. Charles Jay S. Lamadrid, RPm, CHRA</div>
             <div class="admin-role">Department Head, Department of Psychology</div>
         </div>
-        <div class="admin-card-text">
+        <div class="admin-card">
+            <div class="admin-photo-placeholder"><i class="fas fa-user"></i></div>
             <div class="admin-name">Engr. Raymart B. Esguerra</div>
             <div class="admin-role">Program Leader, BS Computer Engineering</div>
         </div>
-        <div class="admin-card-text">
+        <div class="admin-card">
+            <div class="admin-photo-placeholder"><i class="fas fa-user"></i></div>
             <div class="admin-name">Dr. Alyssa Kae A. Lavadia, RPm, RPsy, ICAPIl</div>
             <div class="admin-role">Program Leader, BS Psychology</div>
         </div>
@@ -270,26 +281,31 @@
 
     <!-- OIC (text-only, centered) -->
     <div style="text-align:center; padding: 0.5rem 0 1.5rem;">
-        <div class="admin-card-text" style="display:inline-flex;">
+        <div class="admin-card">
+            <div class="admin-photo-placeholder"><i class="fas fa-user"></i></div>
             <div class="admin-name">Mr. Jullian Paul A. Gimena</div>
             <div class="admin-role">Officer In-Charge, Administrative Services Unit</div>
         </div>
     </div>
 
     <div class="admin-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
-        <div class="admin-card-text">
+        <div class="admin-card">
+            <div class="admin-photo-placeholder"><i class="fas fa-user"></i></div>
             <div class="admin-name">Ms. Mariela Carla E. Jimenez, LPT</div>
             <div class="admin-role">College Registrar</div>
         </div>
-        <div class="admin-card-text">
+        <div class="admin-card">
+            <div class="admin-photo-placeholder"><i class="fas fa-user"></i></div>
             <div class="admin-name">Mr. Jullian Paul A. Gimena</div>
             <div class="admin-role">College Secretary<br>Coordinator, Records and Data Management</div>
         </div>
-        <div class="admin-card-text">
+        <div class="admin-card">
+            <div class="admin-photo-placeholder"><i class="fas fa-user"></i></div>
             <div class="admin-name">Mr. Jerickson C. Bautista</div>
             <div class="admin-role">Coordinator, Accreditation, Recognition, and Certification<br>Coordinator, Monitoring and Evaluation</div>
         </div>
-        <div class="admin-card-text">
+        <div class="admin-card">
+            <div class="admin-photo-placeholder"><i class="fas fa-user"></i></div>
             <div class="admin-name">Ms. Reeka Mae B. Villaluz, RPh, RPm</div>
             <div class="admin-role">Coordinator, Science Laboratories</div>
         </div>

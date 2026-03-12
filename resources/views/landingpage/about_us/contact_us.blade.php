@@ -1,6 +1,7 @@
 @extends('layouts.app-index')
 
 @section('title', 'Contact Us')
+@section('hide_footer', ' ')
 
 @push('styles')
 <style>
@@ -23,7 +24,7 @@
         background: #1e3a5f;
         color: #f0f4f8;
         padding: 2.5rem 2rem;
-        flex: 0 0 360px;
+        flex: 0 0 400px;
         display: flex;
         flex-direction: column;
         gap: 0;
@@ -47,24 +48,64 @@
     }
 
     .contact-block p {
-        font-size: 0.92rem;
+        font-size: 0.88rem;
         color: #c8d8ea;
-        line-height: 1.7;
-        margin: 0;
-    }
-
-    .contact-block p a {
-        color: #f1c40f;
-        text-decoration: none;
-    }
-
-    .contact-block p a:hover {
-        text-decoration: underline;
+        line-height: 1.6;
+        margin: 0 0 0.2rem;
     }
 
     .contact-block .label {
         font-weight: 700;
         color: #f0f4f8;
+    }
+
+    .contact-dept {
+        margin-bottom: 1.25rem;
+        padding-bottom: 1.25rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .contact-dept:last-of-type {
+        border-bottom: none;
+        margin-bottom: 0;
+    }
+
+    .contact-dept h3 {
+        font-size: 0.72rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #93c5fd;
+        margin: 0 0 0.6rem;
+    }
+
+    .contact-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+        margin-bottom: 0.3rem;
+        font-size: 0.87rem;
+        color: #c8d8ea;
+        line-height: 1.45;
+    }
+
+    .contact-item i {
+        color: #60a5fa;
+        font-size: 0.78rem;
+        margin-top: 0.2rem;
+        flex-shrink: 0;
+        width: 14px;
+        text-align: center;
+    }
+
+    .contact-item a {
+        color: #c8d8ea;
+        text-decoration: none;
+    }
+
+    .contact-item a:hover {
+        color: #f1c40f;
+        text-decoration: underline;
     }
 
     .contact-hours {
@@ -153,55 +194,75 @@
             <hr>
 
             <div class="contact-block">
-                <p>Address: Brgy. Navarro, City of General Trias, Cavite</p>
+                <p>Brgy. Navarro, City of General Trias, Cavite</p>
+                <p>Arnaldo Highway, General Trias, Cavite, Philippines</p>
             </div>
 
-            <div class="contact-block">
-                <p>Samuel Christian College, Arnaldo Highway, General Trias, Cavite, Philippines</p>
+            <div class="contact-dept">
+                <h3><i class="fas fa-school" style="margin-right:0.4rem"></i>Junior High School</h3>
+                <div class="contact-item"><i class="fas fa-phone"></i><a href="tel:+6346402-0725">(046) 402-0725</a></div>
+                <div class="contact-item"><i class="fas fa-mobile-screen-button"></i><a href="tel:+639167295830">0916 729 5830</a></div>
+                <div class="contact-item"><i class="fab fa-facebook-messenger"></i><span>Scc Jhs Registrar</span></div>
+                <div class="contact-item"><i class="fas fa-envelope"></i><a href="mailto:sccjhsdepartment@gmail.com">sccjhsdepartment@gmail.com</a></div>
             </div>
 
-            <div class="contact-block">
-                <p><span class="label">Contact No.:</span> <a href="tel:+6346402-0725">(046) 402-0725</a></p>
-                <p><span class="label">Email:</span> <a href="mailto:samuelchristiancollegegti@gmail.com">samuelchristiancollegegti@gmail.com</a></p>
+            <div class="contact-dept">
+                <h3><i class="fas fa-graduation-cap" style="margin-right:0.4rem"></i>Senior High School</h3>
+                <div class="contact-item"><i class="fas fa-phone"></i><a href="tel:+6346402-0725">(046) 402-0725</a></div>
+                <div class="contact-item"><i class="fas fa-mobile-screen-button"></i><a href="tel:+639167295830">0916 729 5830</a></div>
+                <div class="contact-item"><i class="fab fa-facebook-messenger"></i><span>Scc Shs Registrar</span></div>
+                <div class="contact-item"><i class="fas fa-envelope"></i><a href="mailto:scc.shsregistrar@gmail.com">scc.shsregistrar@gmail.com</a></div>
             </div>
 
-            <div class="contact-block">
-                <p><span class="label">Contact No.:</span> <a href="tel:+6346456-9955">(046) 456-9955</a> / <a href="tel:+639167295830">09167295830</a></p>
-                <p><span class="label">Email:</span> <a href="mailto:sccgticollegedepartment@gmail.com">sccgticollegedepartment@gmail.com</a></p>
+            <div class="contact-dept">
+                <h3><i class="fas fa-university" style="margin-right:0.4rem"></i>College</h3>
+                <div class="contact-item"><i class="fas fa-mobile-screen-button"></i><a href="tel:+639568633828">0956 863 3828</a></div>
+                <div class="contact-item"><i class="fas fa-phone"></i><a href="tel:+63464569955">(046) 456-9955</a></div>
+                <div class="contact-item"><i class="fas fa-envelope"></i><a href="mailto:sccgticollegedepartment@gmail.com">sccgticollegedepartment@gmail.com</a></div>
             </div>
 
-            <div class="contact-block">
-                <p>For more inquiries and concerns, kindly send us a message or call.</p>
+            <div class="contact-dept">
+                <h3><i class="fas fa-cash-register" style="margin-right:0.4rem"></i>Cashier</h3>
+                <div class="contact-item"><i class="fas fa-phone"></i><a href="tel:+6346402-0725">(046) 402-0725</a></div>
+                <div class="contact-item"><i class="fas fa-mobile-screen-button"></i><a href="tel:+639959881911">0995-988 1911</a></div>
+            </div>
+
+            <div class="contact-dept">
+                <h3><i class="fas fa-heart" style="margin-right:0.4rem"></i>Guidance</h3>
+                <div class="contact-item"><i class="fas fa-phone"></i><a href="tel:+63465097310">(046) 509-7310</a></div>
+                <div class="contact-item"><i class="fas fa-phone"></i><a href="tel:+63465098481">(046) 509-8481</a></div>
+                <div class="contact-item"><i class="fas fa-mobile-screen-button"></i><a href="tel:+639533769919">0953-376-9919</a></div>
             </div>
 
             <div class="contact-hours">
                 <h3>Office Hours</h3>
+                @php $todayDow = now()->dayOfWeek; @endphp
                 <table class="hours-table">
-                    <tr class="today">
+                    <tr class="{{ $todayDow === 1 ? 'today' : '' }}">
                         <td>Mon</td>
                         <td>09:00 am – 05:00 pm</td>
                     </tr>
-                    <tr>
+                    <tr class="{{ $todayDow === 2 ? 'today' : '' }}">
                         <td>Tue</td>
                         <td>09:00 am – 05:00 pm</td>
                     </tr>
-                    <tr>
+                    <tr class="{{ $todayDow === 3 ? 'today' : '' }}">
                         <td>Wed</td>
                         <td>09:00 am – 05:00 pm</td>
                     </tr>
-                    <tr>
+                    <tr class="{{ $todayDow === 4 ? 'today' : '' }}">
                         <td>Thu</td>
                         <td>09:00 am – 05:00 pm</td>
                     </tr>
-                    <tr>
+                    <tr class="{{ $todayDow === 5 ? 'today' : '' }}">
                         <td>Fri</td>
                         <td>09:00 am – 05:00 pm</td>
                     </tr>
-                    <tr>
+                    <tr class="{{ $todayDow === 6 ? 'today' : '' }}">
                         <td>Sat</td>
                         <td>Closed</td>
                     </tr>
-                    <tr>
+                    <tr class="{{ $todayDow === 0 ? 'today' : '' }}">
                         <td>Sun</td>
                         <td>Closed</td>
                     </tr>

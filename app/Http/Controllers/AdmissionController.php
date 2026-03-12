@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreApplicationRequest;
 use App\Models\Application;
+use App\Models\ExamSchedule;
 use App\Models\Program;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -108,22 +109,70 @@ class AdmissionController extends Controller
         }
         unset($data['document']);
 
-        // Status is 'pending' by default — applicant must pass entrance
-        // exam and complete payment before being converted to a Student.
-        Application::create($data);
+        // Create application and generate unique App ID
+        $app = Application::create($data);
+        $appId = 'APP-' . date('Y') . '-' . str_pad($app->id, 5, '0', STR_PAD_LEFT);
+        $app->update(['app_id' => $appId]);
 
-        return redirect()->route('admission.success');
+        return redirect()->route('admission.exam-schedule', $appId);
     }
 
     /**
-     * Look up application status by email.
+     * Show the entrance exam schedule selection page.
+     */
+    public function examSchedule(string $appId): View
+    {
+        $application = Application::where('app_id', $appId)
+            ->with('program')
+            ->firstOrFail();
+
+        $schedules = ExamSchedule::withSlots()->get();
+
+        return view('admission.exam_schedule', compact('application', 'schedules'));
+    }
+
+    /**
+     * Save the student's chosen exam schedule.
+     */
+    public function storeExamSchedule(\Illuminate\Http\Request $request, string $appId): RedirectResponse
+    {
+        $application = Application::where('app_id', $appId)->firstOrFail();
+
+        $request->validate([
+            'exam_schedule_id' => ['required', 'exists:exam_schedules,id'],
+        ], [
+            'exam_schedule_id.required' => 'Please choose an exam schedule before continuing.',
+            'exam_schedule_id.exists'   => 'The selected schedule is no longer available.',
+        ]);
+
+        $sched = ExamSchedule::withCount('applications')->findOrFail($request->exam_schedule_id);
+
+        if (! $sched->is_active) {
+            return back()->withErrors(['exam_schedule_id' => 'That schedule is no longer available.'])->withInput();
+        }
+
+        $available = max(0, $sched->max_capacity - $sched->applications_count);
+        if ($available === 0) {
+            return back()->withErrors(['exam_schedule_id' => 'That schedule is now full. Please choose another.'])->withInput();
+        }
+
+        $application->update(['exam_schedule_id' => $sched->id]);
+
+        return redirect()->route('admission.payment.show', $appId);
+    }
+
+    /**
+     * Look up application status by Application ID or email.
      */
     public function trackSearch(\Illuminate\Http\Request $request): View
     {
-        $request->validate(['email' => 'required|email']);
+        $request->validate(['search' => 'required|string|max:255']);
 
-        $application = Application::with('program')
-            ->where('email', $request->email)
+        $search = trim($request->search);
+
+        $application = Application::with(['program', 'admissionPayment'])
+            ->where('app_id', $search)
+            ->orWhere('email', $search)
             ->latest()
             ->first();
 

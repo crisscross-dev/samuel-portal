@@ -10,6 +10,8 @@
     <style>
         body {
             background: url('{{ asset("images/background.png") }}') no-repeat center center;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                "Helvetica Neue", Arial, sans-serif !important;
         }
     </style>
     @vite(['resources/css/app.css', 'resources/css/login.css'])
@@ -24,7 +26,7 @@
                 <div class="clinic-logo">
                     <img src="{{ asset('images/scc_logo.png') }}" alt="SCC Logo" width="75" height="75">
                 </div>
-                <h1>Samuel Christian Collee General Trias Inc.</h1>
+                <h1>Samuel Christian College General Trias Inc.</h1>
                 <p>School Management System</p>
                 <p>Secure access to academic records, enrollment, grades, and school administration.</p>
             </div>
@@ -101,6 +103,13 @@
                         <a href="#" id="forgot-password-link">
                             <i class="bi bi-key" style="margin-right: 0.25rem; font-size: 0.8rem;"></i>
                             Forgot your password?
+                        </a>
+                    </div>
+
+                    <div class="back-to-home">
+                        <a href="{{ url('/') }}">
+                            <i class="bi bi-arrow-left" style="margin-right: 0.25rem; font-size: 0.8rem;"></i>
+                            Back to Home
                         </a>
                     </div>
                 </form>

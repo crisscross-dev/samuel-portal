@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Application extends Model
 {
@@ -27,6 +28,10 @@ class Application extends Model
         'elementary_school',
         'document_path',
         'status',
+        'payment_status',
+        'app_id',
+        'exam_schedule',
+        'exam_schedule_id',
         'remarks',
         'reviewed_by',
         'reviewed_at',
@@ -50,6 +55,16 @@ class Application extends Model
     public function reviewer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'reviewed_by');
+    }
+
+    public function admissionPayment(): HasOne
+    {
+        return $this->hasOne(AdmissionPayment::class);
+    }
+
+    public function examSchedule(): BelongsTo
+    {
+        return $this->belongsTo(ExamSchedule::class, 'exam_schedule_id');
     }
 
     /* ─── Scopes ─────────────────────────────────────── */
@@ -89,5 +104,29 @@ class Application extends Model
     public function isRejected(): bool
     {
         return $this->status === 'rejected';
+    }
+
+    /**
+     * Human-readable exam schedule label (new relationship or legacy string).
+     */
+    public function examLabel(): string
+    {
+        if ($this->examSchedule) {
+            $time = $this->examSchedule->time_slot === '9am' ? '9:00 AM' : '1:00 PM';
+            return $this->examSchedule->exam_date->format('l, F j, Y') . ' – ' . $time;
+        }
+        if ($this->exam_schedule === 'saturday_9am') return 'Saturday – 9:00 AM';
+        if ($this->exam_schedule === 'saturday_1pm') return 'Saturday – 1:00 PM';
+        return 'Not yet selected';
+    }
+
+    public function hasPaymentSubmitted(): bool
+    {
+        return $this->admissionPayment !== null;
+    }
+
+    public function isPaymentPaid(): bool
+    {
+        return $this->payment_status === 'paid';
     }
 }

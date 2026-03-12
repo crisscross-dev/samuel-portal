@@ -43,6 +43,9 @@
         <a href="{{ route('registrar.applications.index') }}" class="nav-link {{ request()->routeIs('registrar.applications.*') ? 'active' : '' }}">
             <i class="bi bi-file-earmark-person"></i> Applications
         </a>
+        <a href="{{ route('registrar.exam-schedules.index') }}" class="nav-link {{ request()->routeIs('registrar.exam-schedules.*') ? 'active' : '' }}">
+            <i class="bi bi-calendar-event"></i> Exam Schedules
+        </a>
         <a href="{{ route('registrar.students.index') }}" class="nav-link {{ request()->routeIs('registrar.students.*') ? 'active' : '' }}">
             <i class="bi bi-person-badge"></i> Students
         </a>
@@ -50,6 +53,9 @@
         <div class="nav-section">Academic Structure</div>
         <a href="{{ route('registrar.grade-levels.index') }}" class="nav-link {{ request()->routeIs('registrar.grade-levels.*') ? 'active' : '' }}">
             <i class="bi bi-list-ol"></i> Grade Levels
+        </a>
+        <a href="{{ route('registrar.subjects.index') }}" class="nav-link {{ request()->routeIs('registrar.subjects.*') ? 'active' : '' }}">
+            <i class="bi bi-book"></i> Subjects
         </a>
         <a href="{{ route('registrar.sections.index') }}" class="nav-link {{ request()->routeIs('registrar.sections.*') ? 'active' : '' }}">
             <i class="bi bi-collection"></i> Sections

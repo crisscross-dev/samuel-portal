@@ -501,13 +501,15 @@ body::before {
 }
 
 .forgot-password,
-.back-to-login {
+.back-to-login,
+.back-to-home {
     text-align: center;
-    margin-top: 2rem;
+    margin-top: 1.25rem;
 }
 
 .forgot-password a,
-.back-to-login a {
+.back-to-login a,
+.back-to-home a {
     color: #1e5799;
     text-decoration: none;
     font-size: 0.95rem;
@@ -517,7 +519,8 @@ body::before {
 }
 
 .forgot-password a::after,
-.back-to-login a::after {
+.back-to-login a::after,
+.back-to-home a::after {
     content: "";
     position: absolute;
     width: 0;
@@ -530,12 +533,14 @@ body::before {
 }
 
 .forgot-password a:hover::after,
-.back-to-login a:hover::after {
+.back-to-login a:hover::after,
+.back-to-home a:hover::after {
     width: 100%;
 }
 
 .forgot-password a:hover,
-.back-to-login a:hover {
+.back-to-login a:hover,
+.back-to-home a:hover {
     color: #207cca;
 }
 

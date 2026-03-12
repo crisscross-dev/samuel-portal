@@ -33,7 +33,7 @@ class DatabaseSeeder extends Seeder
 
         // ── Create Admin User ─────────────────────────────
         $admin = User::firstOrCreate(
-            ['email' => 'admin@scc.edu.ph'],
+            ['email' => 'admin@gmail.com'],
             [
                 'name'      => 'System Administrator',
                 'password'  => 'password',
@@ -44,7 +44,7 @@ class DatabaseSeeder extends Seeder
 
         // ── Create Registrar User ─────────────────────────
         $registrar = User::firstOrCreate(
-            ['email' => 'registrar@scc.edu.ph'],
+            ['email' => 'registrar@gmail.com'],
             [
                 'name'      => 'Registrar Staff',
                 'password'  => 'password',
@@ -84,7 +84,7 @@ class DatabaseSeeder extends Seeder
 
         // ── Create Sample Faculty ─────────────────────────
         $facultyUser = User::firstOrCreate(
-            ['email' => 'faculty@scc.edu.ph'],
+            ['email' => 'faculty@gail.com'],
             [
                 'name'      => 'Prof. Juan Dela Cruz',
                 'password'  => 'password',
@@ -102,7 +102,7 @@ class DatabaseSeeder extends Seeder
         );
 
         $facultyUser2 = User::firstOrCreate(
-            ['email' => 'faculty2@scc.edu.ph'],
+            ['email' => 'faculty2@gmail.com'],
             [
                 'name'      => 'Prof. Ana Reyes',
                 'password'  => 'password',
@@ -125,7 +125,7 @@ class DatabaseSeeder extends Seeder
 
         // ── Create Sample Student ─────────────────────────
         $studentUser = User::firstOrCreate(
-            ['email' => 'student@scc.edu.ph'],
+            ['email' => 'student@gmail.com'],
             [
                 'name'      => 'Maria Santos',
                 'password'  => 'password',
@@ -136,9 +136,15 @@ class DatabaseSeeder extends Seeder
 
         // ── Create Programs ───────────────────────────────
         $programs = [
-            ['code' => 'BSIT',  'name' => 'Bachelor of Science in Information Technology', 'duration_years' => 4],
-            ['code' => 'BSCS', 'name' => 'Bachelor of Science in Computer Science', 'duration_years' => 4],
-            ['code' => 'BSED', 'name' => 'Bachelor of Secondary Education', 'duration_years' => 4],
+            // JHS
+            ['code' => 'JHS-G7',  'name' => 'Grade 7',  'duration_years' => 1],
+            ['code' => 'JHS-G8',  'name' => 'Grade 8',  'duration_years' => 1],
+            ['code' => 'JHS-G9',  'name' => 'Grade 9',  'duration_years' => 1],
+            ['code' => 'JHS-G10', 'name' => 'Grade 10', 'duration_years' => 1],
+            // College
+            ['code' => 'BSIT', 'name' => 'Bachelor of Science in Information Technology', 'duration_years' => 4],
+            ['code' => 'BSCS', 'name' => 'Bachelor of Science in Computer Science',        'duration_years' => 4],
+            ['code' => 'BSED', 'name' => 'Bachelor of Secondary Education',                'duration_years' => 4],
             ['code' => 'BSBA', 'name' => 'Bachelor of Science in Business Administration', 'duration_years' => 4],
         ];
 

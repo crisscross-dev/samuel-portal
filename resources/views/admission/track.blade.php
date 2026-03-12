@@ -49,7 +49,7 @@
         <!-- Track Section -->
         <div class="patient-section" style="max-width: 560px; margin: 0 auto 1.5rem;">
             <h2 class="section-title"><i class="fas fa-magnifying-glass me-2"></i>Track Your Application</h2>
-            <p class="section-subtitle mb-4">Enter your email address to check your application status.</p>
+            <p class="section-subtitle mb-4">Enter your <strong>Application ID</strong> (e.g. APP-2026-00001) or <strong>email address</strong> to check your status.</p>
 
             @if($errors->any())
             <div class="alert alert-danger py-2">
@@ -62,11 +62,12 @@
             <form method="POST" action="{{ route('admission.track.search') }}">
                 @csrf
                 <div class="mb-3">
-                    <label for="email" class="form-label fw-semibold">Email Address</label>
+                    <label for="search" class="form-label fw-semibold">Application ID or Email</label>
                     <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                        <input type="email" class="form-control" id="email" name="email"
-                            value="{{ old('email') }}" required autofocus placeholder="your@email.com">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input type="text" class="form-control" id="search" name="search"
+                            value="{{ old('search') }}" required autofocus
+                            placeholder="APP-2026-00001 or your@email.com">
                     </div>
                 </div>
                 <button type="submit" class="btn btn-primary w-100 fw-semibold">
@@ -80,8 +81,14 @@
             <div class="border rounded p-3">
                 <h6 class="fw-bold mb-3"><i class="fas fa-file-lines me-1"></i> Application Details</h6>
                 <table class="table table-sm table-borderless mb-0">
+                    @if($application->app_id)
                     <tr>
-                        <td class="text-muted" style="width:40%">Name</td>
+                        <td class="text-muted" style="width:40%">Application ID</td>
+                        <td><span class="badge bg-dark fw-bold" style="font-size:0.85rem; letter-spacing:1px;">{{ $application->app_id }}</span></td>
+                    </tr>
+                    @endif
+                    <tr>
+                        <td class="text-muted">Name</td>
                         <td class="fw-semibold">{{ $application->fullName() }}</td>
                     </tr>
                     <tr>
@@ -112,6 +119,18 @@
                             </span>
                         </td>
                     </tr>
+                    <tr>
+                        <td class="text-muted">Payment</td>
+                        <td>
+                            @if($application->isPaymentPaid())
+                            <span class="badge bg-success fs-6"><i class="fas fa-circle-check me-1"></i>Paid</span>
+                            @elseif($application->hasPaymentSubmitted())
+                            <span class="badge bg-primary fs-6"><i class="fas fa-hourglass-half me-1"></i>Under Verification</span>
+                            @else
+                            <span class="badge bg-warning text-dark fs-6"><i class="fas fa-clock me-1"></i>Pending</span>
+                            @endif
+                        </td>
+                    </tr>
                     @if($application->remarks)
                     <tr>
                         <td class="text-muted">Remarks</td>
@@ -126,6 +145,30 @@
                     @endif
                 </table>
 
+                {{-- Payment CTA --}}
+                @if($application->app_id)
+                @if($application->isPaymentPaid())
+                <div class="alert alert-success mt-3 mb-2 small">
+                    <i class="fas fa-circle-check me-1"></i>
+                    Payment verified. Your admission is being processed.
+                </div>
+                @elseif($application->hasPaymentSubmitted())
+                <div class="alert alert-info mt-3 mb-2 small">
+                    <i class="fas fa-hourglass-half me-1"></i>
+                    Your GCash receipt is under review. We will notify you once verified.
+                </div>
+                @else
+                <div class="alert alert-warning mt-3 mb-2 small">
+                    <i class="fas fa-triangle-exclamation me-1"></i>
+                    Admission fee (₱200) is required to complete your application.
+                </div>
+                <a href="{{ route('admission.payment.show', $application->app_id) }}"
+                    class="btn btn-warning w-100 fw-semibold">
+                    <i class="fas fa-qrcode me-2"></i> Continue Payment — ₱200
+                </a>
+                @endif
+                @endif
+
                 @if($application->isApproved())
                 <div class="alert alert-success mt-3 mb-0 small">
                     <i class="fas fa-circle-check me-1"></i>
@@ -136,7 +179,7 @@
                     <i class="fas fa-circle-xmark me-1"></i>
                     Unfortunately, your application was not approved. Please contact the Registrar's Office for more information.
                 </div>
-                @else
+                @elseif(!$application->app_id)
                 <div class="alert alert-info mt-3 mb-0 small">
                     <i class="fas fa-clock me-1"></i>
                     Your application is still under review. Please check back later.
@@ -147,7 +190,7 @@
             <hr>
             <div class="alert alert-warning mb-0">
                 <i class="fas fa-triangle-exclamation me-1"></i>
-                No application found with that email address.
+                No application found with that ID or email address.
             </div>
             @endif
         </div>

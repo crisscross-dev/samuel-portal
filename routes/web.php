@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdmissionController;
+use App\Http\Controllers\AdmissionPaymentController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin\AcademicYearController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
@@ -15,10 +16,12 @@ use App\Http\Controllers\Faculty\SectionController as FacultySectionController;
 use App\Http\Controllers\Registrar\ApplicationController;
 use App\Http\Controllers\Registrar\DashboardController as RegistrarDashboard;
 use App\Http\Controllers\Registrar\EnrollmentController;
+use App\Http\Controllers\Registrar\ExamScheduleController;
 use App\Http\Controllers\Registrar\GradeLevelController;
 use App\Http\Controllers\Registrar\PaymentController;
 use App\Http\Controllers\Registrar\SectionController;
 use App\Http\Controllers\Registrar\StudentController;
+use App\Http\Controllers\Registrar\SubjectController;
 use App\Http\Controllers\Student\DashboardController as StudentDashboard;
 use App\Http\Controllers\Student\EnrollmentController as StudentEnrollmentController;
 use App\Http\Controllers\Student\GradeController as StudentGradeController;
@@ -64,6 +67,10 @@ Route::prefix('admission')->name('admission.')->group(function () {
     Route::get('/success', [AdmissionController::class, 'success'])->name('success');
     Route::get('/track',   [AdmissionController::class, 'track'])->name('track');
     Route::post('/track',  [AdmissionController::class, 'trackSearch'])->name('track.search');
+    Route::get('/exam-schedule/{appId}',  [AdmissionController::class, 'examSchedule'])->name('exam-schedule');
+    Route::post('/exam-schedule/{appId}', [AdmissionController::class, 'storeExamSchedule'])->name('exam-schedule.store');
+    Route::get('/payment/{appId}',  [AdmissionPaymentController::class, 'show'])->name('payment.show');
+    Route::post('/payment/{appId}', [AdmissionPaymentController::class, 'store'])->name('payment.store');
 });
 
 // ─── Admin Routes ─────────────────────────────────────────────────
@@ -118,9 +125,21 @@ Route::prefix('registrar')
         Route::get('/applications/{application}', [ApplicationController::class, 'show'])->name('applications.show');
         Route::patch('/applications/{application}/approve', [ApplicationController::class, 'approve'])->name('applications.approve');
         Route::patch('/applications/{application}/reject', [ApplicationController::class, 'reject'])->name('applications.reject');
+        Route::patch('/applications/{application}/verify-payment', [ApplicationController::class, 'verifyPayment'])->name('applications.verify-payment');
+        Route::patch('/applications/{application}/assign-schedule', [ApplicationController::class, 'assignSchedule'])->name('applications.assign-schedule');
+
+        // Exam Schedule management
+        Route::get('/exam-schedules', [ExamScheduleController::class, 'index'])->name('exam-schedules.index');
+        Route::post('/exam-schedules', [ExamScheduleController::class, 'store'])->name('exam-schedules.store');
+        Route::patch('/exam-schedules/{examSchedule}', [ExamScheduleController::class, 'update'])->name('exam-schedules.update');
+        Route::patch('/exam-schedules/{examSchedule}/toggle', [ExamScheduleController::class, 'toggle'])->name('exam-schedules.toggle');
+        Route::delete('/exam-schedules/{examSchedule}', [ExamScheduleController::class, 'destroy'])->name('exam-schedules.destroy');
 
         // Grade Level management
         Route::resource('grade-levels', GradeLevelController::class)->except(['show']);
+
+        // Subject management
+        Route::resource('subjects', SubjectController::class)->except(['show']);
 
         // Student management
         Route::resource('students', StudentController::class);

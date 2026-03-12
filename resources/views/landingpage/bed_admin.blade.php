@@ -81,6 +81,10 @@
         object-fit: cover;
         object-position: top;
         flex-shrink: 0;
+        background: linear-gradient(to bottom,
+                rgba(242, 243, 245, 0.95),
+                rgba(242, 243, 245, 0.70));
+        border-radius: 12px;
     }
 
     .admin-leadership-text .admin-name {
@@ -115,6 +119,7 @@
         border: 3px solid #e2e8f0;
         box-shadow: 0 4px 14px rgba(30, 58, 95, 0.12);
         margin-bottom: 0.75rem;
+        background: #f0f4f8;
     }
 
     .admin-photo-placeholder {
@@ -223,26 +228,31 @@
 
     <!-- Academic Head: Math, Science & Tech -->
     <div style="text-align:center; padding: 0.5rem 0 1rem;">
-        <div class="admin-card-text" style="display:inline-flex;">
+        <div class="admin-card" style="display:inline-flex; flex-direction:column; align-items:center;">
+            <div class="admin-photo-placeholder"><i class="fas fa-user"></i></div>
             <div class="admin-name">Mr. Jezreel James M. Colina, LPT</div>
             <div class="admin-role">Academic Head, Mathematics, Science, and Technology Unit</div>
         </div>
     </div>
 
     <div class="admin-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
-        <div class="admin-card-text">
+        <div class="admin-card">
+            <div class="admin-photo-placeholder"><i class="fas fa-user"></i></div>
             <div class="admin-name">Ms. Lianne T. Dejero, LPT</div>
             <div class="admin-role">SDU Leader, Mathematics Unit</div>
         </div>
-        <div class="admin-card-text">
+        <div class="admin-card">
+            <div class="admin-photo-placeholder"><i class="fas fa-user"></i></div>
             <div class="admin-name">Ms. Ma. Rizalina D. Mariano, LPT</div>
             <div class="admin-role">SDU Leader, Science Unit</div>
         </div>
-        <div class="admin-card-text">
+        <div class="admin-card">
+            <div class="admin-photo-placeholder"><i class="fas fa-user"></i></div>
             <div class="admin-name">Mr. Richard C. Reforma</div>
             <div class="admin-role">SDU Leader, Computer Studies Unit</div>
         </div>
-        <div class="admin-card-text">
+        <div class="admin-card">
+            <div class="admin-photo-placeholder"><i class="fas fa-user"></i></div>
             <div class="admin-name">Mr. Laurence Kim M. Sy</div>
             <div class="admin-role">SDU Leader, Business Management, and Livelihood Education Unit</div>
         </div>
@@ -250,30 +260,36 @@
 
     <!-- Academic Head: Language and Arts -->
     <div style="text-align:center; padding: 0.5rem 0 1rem;">
-        <div class="admin-card-text" style="display:inline-flex;">
+        <div class="admin-card" style="display:inline-flex; flex-direction:column; align-items:center;">
+            <div class="admin-photo-placeholder"><i class="fas fa-user"></i></div>
             <div class="admin-name">Ms. Joeliza T. Pablo, LPT</div>
             <div class="admin-role">Academic Head, Language and Arts</div>
         </div>
     </div>
 
     <div class="admin-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
-        <div class="admin-card-text">
+        <div class="admin-card">
+            <div class="admin-photo-placeholder"><i class="fas fa-user"></i></div>
             <div class="admin-name">Mr. Matthew Geosef B. Beringuela, LPT</div>
             <div class="admin-role">SDU Leader, SHS English Unit</div>
         </div>
-        <div class="admin-card-text">
+        <div class="admin-card">
+            <div class="admin-photo-placeholder"><i class="fas fa-user"></i></div>
             <div class="admin-name">Ms. Rachel Ann G. Malsi, LPT</div>
             <div class="admin-role">SDU Leader, Filipino Unit</div>
         </div>
-        <div class="admin-card-text">
+        <div class="admin-card">
+            <div class="admin-photo-placeholder"><i class="fas fa-user"></i></div>
             <div class="admin-name">Ms. Romina C. Quinto, LPT</div>
             <div class="admin-role">SDU Leader, Social Science Unit</div>
         </div>
-        <div class="admin-card-text">
+        <div class="admin-card">
+            <div class="admin-photo-placeholder"><i class="fas fa-user"></i></div>
             <div class="admin-name">Ms. Marjorie G. Ruiz, LPT</div>
             <div class="admin-role">SDU Leader, Music, Arts, PE and Health Unit</div>
         </div>
-        <div class="admin-card-text">
+        <div class="admin-card">
+            <div class="admin-photo-placeholder"><i class="fas fa-user"></i></div>
             <div class="admin-name">Ms. Justine Mae T. Olat</div>
             <div class="admin-role">SDU Leader, Christian Values Unit</div>
         </div>
@@ -298,27 +314,33 @@
 
     <!-- Coordinators (text-only) -->
     <div class="admin-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
-        <div class="admin-card-text">
+        <div class="admin-card">
+            <div class="admin-photo-placeholder"><i class="fas fa-user"></i></div>
             <div class="admin-name">Mrs. Elizabeth N. Arriesgado</div>
             <div class="admin-role">Coordinator, SHS Research Unit</div>
         </div>
-        <div class="admin-card-text">
+        <div class="admin-card">
+            <div class="admin-photo-placeholder"><i class="fas fa-user"></i></div>
             <div class="admin-name">Ms. Edna T. Leveriza, LPT</div>
             <div class="admin-role">Coordinator, SHS Work Immersion Unit</div>
         </div>
-        <div class="admin-card-text">
+        <div class="admin-card">
+            <div class="admin-photo-placeholder"><i class="fas fa-user"></i></div>
             <div class="admin-name">Ms. Rizza A. Domingo, LPT</div>
             <div class="admin-role">Coordinator, HS Monitoring and Evaluation</div>
         </div>
-        <div class="admin-card-text">
+        <div class="admin-card">
+            <div class="admin-photo-placeholder"><i class="fas fa-user"></i></div>
             <div class="admin-name">Ms. Charlene Kaye D. Morado, LPT</div>
             <div class="admin-role">Coordinator, HS Intervention Program</div>
         </div>
-        <div class="admin-card-text">
+        <div class="admin-card">
+            <div class="admin-photo-placeholder"><i class="fas fa-user"></i></div>
             <div class="admin-name">Ms. Anna Romina T. Cortez, LPT</div>
             <div class="admin-role">Coordinator, HS Science Laboratory</div>
         </div>
-        <div class="admin-card-text">
+        <div class="admin-card">
+            <div class="admin-photo-placeholder"><i class="fas fa-user"></i></div>
             <div class="admin-name">Mr. Laurence Kim M. Sy</div>
             <div class="admin-role">Coordinator, HS TLE Laboratory</div>
         </div>

@@ -3,7 +3,9 @@
 
 @section('content')
 <div class="card" style="max-width: 900px;">
-    <div class="card-header"><h6 class="mb-0"><i class="bi bi-plus-lg me-1"></i> Create Section</h6></div>
+    <div class="card-header">
+        <h6 class="mb-0"><i class="bi bi-plus-lg me-1"></i> Create Section</h6>
+    </div>
     <div class="card-body">
         <form method="POST" action="{{ route('registrar.sections.store') }}">
             @csrf
@@ -17,9 +19,9 @@
                     <select name="grade_level_id" class="form-select" required>
                         <option value="">Select Grade Level</option>
                         @foreach($gradeLevels as $gl)
-                            <option value="{{ $gl->id }}" {{ old('grade_level_id') == $gl->id ? 'selected' : '' }}>
-                                {{ $gl->department->code ?? '' }} — {{ $gl->name }}
-                            </option>
+                        <option value="{{ $gl->id }}" {{ old('grade_level_id') == $gl->id ? 'selected' : '' }}>
+                            {{ $gl->department->code ?? '' }} — {{ $gl->name }}
+                        </option>
                         @endforeach
                     </select>
                 </div>
@@ -28,9 +30,9 @@
                     <select name="academic_year_id" class="form-select" required>
                         <option value="">Select AY</option>
                         @foreach($academicYears as $ay)
-                            <option value="{{ $ay->id }}" {{ old('academic_year_id') == $ay->id ? 'selected' : '' }}>
-                                {{ $ay->name }} {{ $ay->is_active ? '(Active)' : '' }}
-                            </option>
+                        <option value="{{ $ay->id }}" {{ old('academic_year_id') == $ay->id ? 'selected' : '' }}>
+                            {{ $ay->name }} {{ $ay->is_active ? '(Active)' : '' }}
+                        </option>
                         @endforeach
                     </select>
                 </div>
@@ -41,7 +43,7 @@
                     <select name="adviser_id" class="form-select">
                         <option value="">TBA</option>
                         @foreach($faculty as $f)
-                            <option value="{{ $f->id }}" {{ old('adviser_id') == $f->id ? 'selected' : '' }}>{{ $f->user->name }}</option>
+                        <option value="{{ $f->id }}" {{ old('adviser_id') == $f->id ? 'selected' : '' }}>{{ $f->user->name }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -52,38 +54,49 @@
             </div>
 
             {{-- Section Subjects --}}
+            @php
+            $subjectOptions = $subjects->map(fn($s) => [
+            'id' => $s->id,
+            'label' => $s->code . ' — ' . $s->name,
+            ])->values();
+            $facultyOptions = $faculty->map(fn($f) => [
+            'id' => $f->id,
+            'label' => $f->user->name,
+            ])->values();
+            @endphp
             <h6 class="fw-bold mb-3"><i class="bi bi-book me-1"></i> Section Subjects</h6>
-            <div id="subjects-container">
+            <div id="section-options-data" data-subjects='@json($subjectOptions)' data-faculty='@json($facultyOptions)' hidden></div>
+            <div id="subjects-container" data-subject-index="{{ old('subjects') ? count(old('subjects')) : 0 }}">
                 @if(old('subjects'))
-                    @foreach(old('subjects') as $i => $subj)
-                        <div class="row g-2 mb-2 subject-row">
-                            <div class="col-md-4">
-                                <select name="subjects[{{ $i }}][subject_id]" class="form-select form-select-sm" required>
-                                    <option value="">Select Subject</option>
-                                    @foreach($subjects as $s)
-                                        <option value="{{ $s->id }}" {{ ($subj['subject_id'] ?? '') == $s->id ? 'selected' : '' }}>{{ $s->code }} — {{ $s->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <select name="subjects[{{ $i }}][faculty_id]" class="form-select form-select-sm">
-                                    <option value="">Faculty TBA</option>
-                                    @foreach($faculty as $f)
-                                        <option value="{{ $f->id }}" {{ ($subj['faculty_id'] ?? '') == $f->id ? 'selected' : '' }}>{{ $f->user->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="col-md-2">
-                                <input type="text" name="subjects[{{ $i }}][schedule]" class="form-control form-control-sm" placeholder="Schedule" value="{{ $subj['schedule'] ?? '' }}">
-                            </div>
-                            <div class="col-md-2">
-                                <input type="text" name="subjects[{{ $i }}][room]" class="form-control form-control-sm" placeholder="Room" value="{{ $subj['room'] ?? '' }}">
-                            </div>
-                            <div class="col-md-1">
-                                <button type="button" class="btn btn-sm btn-outline-danger w-100 remove-subject"><i class="bi bi-x-lg"></i></button>
-                            </div>
-                        </div>
-                    @endforeach
+                @foreach(old('subjects') as $i => $subj)
+                <div class="row g-2 mb-2 subject-row">
+                    <div class="col-md-4">
+                        <select name="subjects[{{ $i }}][subject_id]" class="form-select form-select-sm" required>
+                            <option value="">Select Subject</option>
+                            @foreach($subjects as $s)
+                            <option value="{{ $s->id }}" @selected(($subj['subject_id'] ?? '' )==$s->id)>{{ $s->code }} — {{ $s->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select name="subjects[{{ $i }}][faculty_id]" class="form-select form-select-sm">
+                            <option value="">Faculty TBA</option>
+                            @foreach($faculty as $f)
+                            <option value="{{ $f->id }}" @selected(($subj['faculty_id'] ?? '' )==$f->id)>{{ $f->user->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <input type="text" name="subjects[{{ $i }}][schedule]" class="form-control form-control-sm" placeholder="Schedule" value="{{ $subj['schedule'] ?? '' }}">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="text" name="subjects[{{ $i }}][room]" class="form-control form-control-sm" placeholder="Room" value="{{ $subj['room'] ?? '' }}">
+                    </div>
+                    <div class="col-md-1">
+                        <button type="button" class="btn btn-sm btn-outline-danger w-100 remove-subject"><i class="bi bi-x-lg"></i></button>
+                    </div>
+                </div>
+                @endforeach
                 @endif
             </div>
             <button type="button" class="btn btn-sm btn-outline-success mb-4" id="add-subject">
@@ -100,16 +113,21 @@
 
 @push('scripts')
 <script>
-    let subjectIndex = {{ old('subjects') ? count(old('subjects')) : 0 }};
-    const subjectsJson = @json($subjects->map(fn($s) => ['id' => $s->id, 'label' => $s->code . ' — ' . $s->name]));
-    const facultyJson = @json($faculty->map(fn($f) => ['id' => $f->id, 'label' => $f->user->name]));
+    const optionsData = document.getElementById('section-options-data');
+    const container = document.getElementById('subjects-container');
+    let subjectIndex = Number(container.dataset.subjectIndex || 0);
+    const subjectsJson = JSON.parse(optionsData.dataset.subjects || '[]');
+    const facultyJson = JSON.parse(optionsData.dataset.faculty || '[]');
 
     document.getElementById('add-subject').addEventListener('click', function() {
-        const container = document.getElementById('subjects-container');
         let subjectOpts = '<option value="">Select Subject</option>';
-        subjectsJson.forEach(s => { subjectOpts += `<option value="${s.id}">${s.label}</option>`; });
+        subjectsJson.forEach(s => {
+            subjectOpts += `<option value="${s.id}">${s.label}</option>`;
+        });
         let facultyOpts = '<option value="">Faculty TBA</option>';
-        facultyJson.forEach(f => { facultyOpts += `<option value="${f.id}">${f.label}</option>`; });
+        facultyJson.forEach(f => {
+            facultyOpts += `<option value="${f.id}">${f.label}</option>`;
+        });
 
         const row = document.createElement('div');
         row.className = 'row g-2 mb-2 subject-row';

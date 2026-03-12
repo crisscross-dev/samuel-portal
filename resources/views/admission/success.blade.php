@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,16 +11,21 @@
         body {
             background: linear-gradient(135deg, #1a3a5c 0%, #2c7be5 100%);
             min-height: 100vh;
-            display: flex; align-items: center; justify-content: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
+
         .success-card {
-            max-width: 520px; width: 100%;
+            max-width: 520px;
+            width: 100%;
             border-radius: 1rem;
-            box-shadow: 0 1rem 3rem rgba(0,0,0,0.25);
+            box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.25);
             text-align: center;
         }
     </style>
 </head>
+
 <body>
     <div class="success-card bg-white p-5">
         <div class="mb-3">
@@ -28,19 +34,53 @@
             </span>
         </div>
 
-        <h4 class="fw-bold text-dark mb-2">Application Submitted!</h4>
-        <p class="text-muted mb-4">
+        <h4 class="fw-bold text-dark mb-2">
+            @if(session('payment_submitted'))
+            Application & Payment Submitted!
+            @else
+            Application Submitted!
+            @endif
+        </h4>
+        <p class="text-muted mb-3">
+            @if(session('payment_submitted'))
+            Thank you! Your application and payment receipt have been received.
+            The Registrar will review your submission and send a confirmation email once your exam slot is confirmed.
+            @else
             Thank you for applying to SCC. Your application has been received and is now under review.
-            You will be notified once a decision has been made.
+            @endif
         </p>
+
+        @if(session('app_id'))
+        <div class="alert alert-secondary py-2 mb-3 text-center">
+            <small class="text-muted d-block">Your Application ID</small>
+            <strong class="fs-6 text-dark" style="letter-spacing:1px;">{{ session('app_id') }}</strong>
+            <small class="d-block text-muted mt-1">Save this ID to track your application status.</small>
+        </div>
+        @endif
+
+        @if(session('exam_schedule'))
+        <div class="alert alert-success py-2 mb-3 text-start small">
+            <i class="bi bi-calendar-check me-1"></i>
+            <strong>Entrance Exam Schedule:</strong>
+            {{ session('exam_schedule') === 'saturday_9am' ? 'Saturday – 9:00 AM (Morning)' : 'Saturday – 1:00 PM (Afternoon)' }}
+        </div>
+        @endif
 
         <div class="alert alert-info text-start small">
             <i class="bi bi-info-circle me-1"></i>
             <strong>What happens next?</strong>
             <ul class="mb-0 mt-1">
+                @if(session('payment_submitted'))
+                <li>The Registrar's Office will verify your payment receipt.</li>
+                <li>Once confirmed, you will receive an <strong>email with your exam schedule</strong> and portal login credentials.</li>
+                <li>Attend the entrance exam on your chosen schedule.</li>
+                <li>If admitted, your student account will be activated.</li>
+                @else
+                <li>Attend the entrance exam on your chosen schedule.</li>
                 <li>The Registrar's Office will review your application.</li>
                 <li>If approved, a student account will be created for you.</li>
                 <li>You will receive your Student ID and login credentials.</li>
+                @endif
             </ul>
         </div>
 
@@ -61,4 +101,5 @@
         </div>
     </div>
 </body>
+
 </html>

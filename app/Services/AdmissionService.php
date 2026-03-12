@@ -2,10 +2,12 @@
 
 namespace App\Services;
 
+use App\Mail\AdmissionConfirmed;
 use App\Models\Application;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class AdmissionService
@@ -21,13 +23,15 @@ class AdmissionService
      *
      * @throws \Exception
      */
-    public function approveApplication(Application $application, int $reviewerId, ?string $remarks = null): Student
+    public function approveApplication(Application $application, mixed $reviewerId, ?string $remarks = null): Student
     {
         if (!$application->isPending()) {
             throw new \Exception('Only pending applications can be approved.');
         }
 
-        return DB::transaction(function () use ($application, $reviewerId, $remarks) {
+        $reviewerId = $reviewerId ? (int) $reviewerId : null;
+
+        $result = DB::transaction(function () use ($application, $reviewerId, $remarks) {
             // 1. Mark application as approved
             $application->update([
                 'status'      => 'approved',
@@ -63,12 +67,24 @@ class AdmissionService
 
             return $student;
         });
+
+        // Send confirmation email outside the transaction so a mail failure
+        // doesn't roll back the student account creation.
+        try {
+            $application->loadMissing('program', 'examSchedule');
+            Mail::to($application->email)->send(new AdmissionConfirmed($application, $result));
+        } catch (\Throwable) {
+            // Log silently — student account already created.
+            logger()->error('Failed to send AdmissionConfirmed email to ' . $application->email);
+        }
+
+        return $result;
     }
 
     /**
      * Reject an application. No user account is created.
      */
-    public function rejectApplication(Application $application, int $reviewerId, ?string $remarks = null): void
+    public function rejectApplication(Application $application, mixed $reviewerId, ?string $remarks = null): void
     {
         if (!$application->isPending()) {
             throw new \Exception('Only pending applications can be rejected.');
@@ -76,7 +92,7 @@ class AdmissionService
 
         $application->update([
             'status'      => 'rejected',
-            'reviewed_by' => $reviewerId,
+            'reviewed_by' => $reviewerId ? (int) $reviewerId : null,
             'reviewed_at' => now(),
             'remarks'     => $remarks,
         ]);
@@ -90,8 +106,8 @@ class AdmissionService
     {
         $year  = now()->year;
         $last  = Student::where('student_id', 'like', "{$year}-%")
-                    ->orderByRaw("CAST(SUBSTRING_INDEX(student_id, '-', -1) AS UNSIGNED) DESC")
-                    ->value('student_id');
+            ->orderByRaw("CAST(SUBSTRING_INDEX(student_id, '-', -1) AS UNSIGNED) DESC")
+            ->value('student_id');
 
         $next = 1;
         if ($last) {

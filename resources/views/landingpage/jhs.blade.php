@@ -385,7 +385,7 @@
             <div class="grade-badge"><i class="fas fa-graduation-cap me-1"></i> Grade 7 to 10</div>
             <br>
             <a href="{{ route('admission.jhs') }}" class="jhs-enrol-btn">
-                <i class="fas fa-pen-to-square"></i> Enroll Now
+                <i class="fas fa-pen-to-square"></i> Apply for Admission
             </a>
         </div>
         <div class="jhs-hero-text" style="text-align:right; flex-shrink:0;">
