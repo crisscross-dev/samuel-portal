@@ -72,14 +72,14 @@
             <ul class="mb-0 mt-1">
                 @if(session('payment_submitted'))
                 <li>The Registrar's Office will verify your payment receipt.</li>
-                <li>Once confirmed, you will receive an <strong>email with your exam schedule</strong> and portal login credentials.</li>
+                <li>Once confirmed, the Registrar can clear you to take the entrance examination.</li>
                 <li>Attend the entrance exam on your chosen schedule.</li>
-                <li>If admitted, your student account will be activated.</li>
+                <li>If you pass, your record will be forwarded to the Guidance Office for interview scheduling.</li>
                 @else
                 <li>Attend the entrance exam on your chosen schedule.</li>
-                <li>The Registrar's Office will review your application.</li>
-                <li>If approved, a student account will be created for you.</li>
-                <li>You will receive your Student ID and login credentials.</li>
+                <li>The Registrar's Office will review your application and determine if you may take the exam.</li>
+                <li>If you pass the exam, the Guidance Office will schedule your interview.</li>
+                <li>You will receive an email with a form link to complete the remaining admission details.</li>
                 @endif
             </ul>
         </div>

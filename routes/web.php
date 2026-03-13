@@ -13,6 +13,8 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Faculty\DashboardController as FacultyDashboard;
 use App\Http\Controllers\Faculty\GradeController;
 use App\Http\Controllers\Faculty\SectionController as FacultySectionController;
+use App\Http\Controllers\Guidance\ApplicationController as GuidanceApplicationController;
+use App\Http\Controllers\Guidance\DashboardController as GuidanceDashboard;
 use App\Http\Controllers\Registrar\ApplicationController;
 use App\Http\Controllers\Registrar\DashboardController as RegistrarDashboard;
 use App\Http\Controllers\Registrar\EnrollmentController;
@@ -71,6 +73,8 @@ Route::prefix('admission')->name('admission.')->group(function () {
     Route::post('/exam-schedule/{appId}', [AdmissionController::class, 'storeExamSchedule'])->name('exam-schedule.store');
     Route::get('/payment/{appId}',  [AdmissionPaymentController::class, 'show'])->name('payment.show');
     Route::post('/payment/{appId}', [AdmissionPaymentController::class, 'store'])->name('payment.store');
+    Route::get('/interview-form/{token}', [AdmissionController::class, 'showInterviewForm'])->name('interview-form.show');
+    Route::post('/interview-form/{token}', [AdmissionController::class, 'submitInterviewForm'])->name('interview-form.submit');
 });
 
 // ─── Admin Routes ─────────────────────────────────────────────────
@@ -125,6 +129,9 @@ Route::prefix('registrar')
         Route::get('/applications/{application}', [ApplicationController::class, 'show'])->name('applications.show');
         Route::patch('/applications/{application}/approve', [ApplicationController::class, 'approve'])->name('applications.approve');
         Route::patch('/applications/{application}/reject', [ApplicationController::class, 'reject'])->name('applications.reject');
+        Route::patch('/applications/{application}/exam-result', [ApplicationController::class, 'recordExamResult'])->name('applications.exam-result');
+        Route::patch('/applications/{application}/verify-requirements', [ApplicationController::class, 'verifyRequirements'])->name('applications.verify-requirements');
+        Route::patch('/applications/{application}/process-enrollment', [ApplicationController::class, 'processEnrollment'])->name('applications.process-enrollment');
         Route::patch('/applications/{application}/verify-payment', [ApplicationController::class, 'verifyPayment'])->name('applications.verify-payment');
         Route::patch('/applications/{application}/assign-schedule', [ApplicationController::class, 'assignSchedule'])->name('applications.assign-schedule');
 
@@ -148,16 +155,13 @@ Route::prefix('registrar')
 
         // Enrollment management
         Route::resource('enrollments', EnrollmentController::class)->except(['edit', 'update']);
-        Route::post('/enrollments/{enrollment}/assess', [EnrollmentController::class, 'assess'])->name('enrollments.assess');
         Route::post('/enrollments/{enrollment}/finalize', [EnrollmentController::class, 'finalize'])->name('enrollments.finalize');
+
+        // Payment logs
+        Route::get('/payments/logs', [PaymentController::class, 'logs'])->name('payments.logs');
 
         // Section management
         Route::resource('sections', SectionController::class);
-
-        // Payment management
-        Route::resource('payments', PaymentController::class)->only(['index', 'create', 'store', 'destroy']);
-        Route::patch('/payments/{payment}/verify', [PaymentController::class, 'verify'])->name('payments.verify');
-        Route::patch('/payments/{payment}/reject', [PaymentController::class, 'reject'])->name('payments.reject');
 
         // Tuition Pricing (read-only)
         Route::get('/pricing', [PricingController::class, 'index'])->name('pricing.index');
@@ -168,6 +172,34 @@ Route::prefix('registrar')
         Route::patch('/grades/{grade}/reopen', [\App\Http\Controllers\Admin\GradeController::class, 'reopen'])->name('grades.reopen');
         Route::patch('/section-subjects/{sectionSubject}/grades/reopen', [\App\Http\Controllers\Admin\GradeController::class, 'reopenSectionSubject'])->name('grades.reopen-section-subject');
         Route::get('/grades/audit-log', [\App\Http\Controllers\Admin\GradeController::class, 'auditLog'])->name('grades.audit-log');
+    });
+
+// ─── Guidance Routes ─────────────────────────────────────────────
+
+Route::prefix('guidance')
+    ->name('guidance.')
+    ->middleware(['auth', 'role:guidance'])
+    ->group(function () {
+        Route::get('/dashboard', [GuidanceDashboard::class, 'index'])->name('dashboard');
+        Route::get('/applications', [GuidanceApplicationController::class, 'index'])->name('applications.index');
+        Route::get('/applications/results', [GuidanceApplicationController::class, 'results'])->name('applications.results');
+        Route::get('/applications/logs', [GuidanceApplicationController::class, 'logs'])->name('applications.logs');
+        Route::get('/applications/{application}', [GuidanceApplicationController::class, 'show'])->name('applications.show');
+        Route::patch('/applications/{application}/schedule-interview', [GuidanceApplicationController::class, 'scheduleInterview'])->name('applications.schedule-interview');
+        Route::patch('/applications/{application}/evaluate-interview', [GuidanceApplicationController::class, 'evaluateInterview'])->name('applications.evaluate-interview');
+    });
+
+// ─── Cashier Routes ──────────────────────────────────────────────
+
+Route::prefix('cashier')
+    ->name('cashier.')
+    ->middleware(['auth', 'role:cashier'])
+    ->group(function () {
+        Route::get('/dashboard', fn() => redirect()->route('cashier.payments.index'))->name('dashboard');
+        Route::get('/payments/logs', [PaymentController::class, 'logs'])->name('payments.logs');
+        Route::resource('payments', PaymentController::class)->only(['index', 'create', 'store', 'destroy']);
+        Route::patch('/payments/{payment}/verify', [PaymentController::class, 'verify'])->name('payments.verify');
+        Route::patch('/payments/{payment}/reject', [PaymentController::class, 'reject'])->name('payments.reject');
     });
 
 // ─── Faculty Routes ──────────────────────────────────────────────

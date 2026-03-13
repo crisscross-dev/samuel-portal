@@ -23,6 +23,8 @@ class DatabaseSeeder extends Seeder
         $roles = [
             ['name' => 'Admin',     'slug' => 'admin',     'description' => 'System Administrator'],
             ['name' => 'Registrar', 'slug' => 'registrar', 'description' => 'Registrar Staff'],
+            ['name' => 'Cashier',   'slug' => 'cashier',   'description' => 'Cashier Staff'],
+            ['name' => 'Guidance',  'slug' => 'guidance',  'description' => 'Guidance Office'],
             ['name' => 'Faculty',   'slug' => 'faculty',   'description' => 'Faculty Member'],
             ['name' => 'Student',   'slug' => 'student',   'description' => 'Student'],
         ];
@@ -52,6 +54,26 @@ class DatabaseSeeder extends Seeder
             ]
         );
         $registrar->assignRole('registrar');
+
+        $cashier = User::firstOrCreate(
+            ['email' => 'cashier@gmail.com'],
+            [
+                'name'      => 'Cashier Staff',
+                'password'  => 'password',
+                'is_active' => true,
+            ]
+        );
+        $cashier->assignRole('cashier');
+
+        $guidance = User::firstOrCreate(
+            ['email' => 'guidance@gmail.com'],
+            [
+                'name'      => 'Guidance Office',
+                'password'  => 'password',
+                'is_active' => true,
+            ]
+        );
+        $guidance->assignRole('guidance');
 
         // ── Create Departments ────────────────────────────
         $jhsDept = Department::firstOrCreate(
@@ -154,21 +176,53 @@ class DatabaseSeeder extends Seeder
 
         // ── Create Subjects ──────────────────────────────
         $subjects = [
-            ['code' => 'IT101', 'name' => 'Introduction to Computing',     'lecture_units' => 3, 'lab_units' => 0],
-            ['code' => 'IT102', 'name' => 'Computer Programming 1',         'lecture_units' => 2, 'lab_units' => 1],
-            ['code' => 'IT103', 'name' => 'Data Structures & Algorithms',  'lecture_units' => 2, 'lab_units' => 1],
-            ['code' => 'IT104', 'name' => 'Database Management Systems',   'lecture_units' => 2, 'lab_units' => 1],
-            ['code' => 'IT105', 'name' => 'Web Development',               'lecture_units' => 2, 'lab_units' => 1],
-            ['code' => 'GE101', 'name' => 'Understanding the Self',        'lecture_units' => 3, 'lab_units' => 0],
-            ['code' => 'GE102', 'name' => 'Mathematics in the Modern World', 'lecture_units' => 3, 'lab_units' => 0],
-            ['code' => 'GE103', 'name' => 'Purposive Communication',       'lecture_units' => 3, 'lab_units' => 0],
+            // Junior High School sample subjects
+            ['code' => 'JHS7-ENG',  'name' => 'English 7',                'lecture_units' => 5, 'lab_units' => 0],
+            ['code' => 'JHS7-MATH', 'name' => 'Mathematics 7',            'lecture_units' => 5, 'lab_units' => 0],
+            ['code' => 'JHS7-SCI',  'name' => 'Science 7',                'lecture_units' => 5, 'lab_units' => 0],
+            ['code' => 'JHS7-FIL',  'name' => 'Filipino 7',               'lecture_units' => 5, 'lab_units' => 0],
+            ['code' => 'JHS7-AP',   'name' => 'Araling Panlipunan 7',     'lecture_units' => 4, 'lab_units' => 0],
+            ['code' => 'JHS7-TLE',  'name' => 'TLE 7',                    'lecture_units' => 4, 'lab_units' => 0],
+            ['code' => 'JHS7-ESP',  'name' => 'Edukasyon sa Pagpapakatao 7', 'lecture_units' => 2, 'lab_units' => 0],
+            ['code' => 'JHS7-MAPEH', 'name' => 'MAPEH 7',                  'lecture_units' => 4, 'lab_units' => 0],
+
+            // College sample subjects
+            ['code' => 'IT101', 'name' => 'Introduction to Computing',        'lecture_units' => 3, 'lab_units' => 0],
+            ['code' => 'IT102', 'name' => 'Computer Programming 1',           'lecture_units' => 2, 'lab_units' => 1],
+            ['code' => 'IT103', 'name' => 'Data Structures & Algorithms',     'lecture_units' => 2, 'lab_units' => 1],
+            ['code' => 'IT104', 'name' => 'Database Management Systems',      'lecture_units' => 2, 'lab_units' => 1],
+            ['code' => 'IT105', 'name' => 'Web Development',                  'lecture_units' => 2, 'lab_units' => 1],
+            ['code' => 'GE101', 'name' => 'Understanding the Self',           'lecture_units' => 3, 'lab_units' => 0],
+            ['code' => 'GE102', 'name' => 'Mathematics in the Modern World',  'lecture_units' => 3, 'lab_units' => 0],
+            ['code' => 'GE103', 'name' => 'Purposive Communication',          'lecture_units' => 3, 'lab_units' => 0],
         ];
 
         foreach ($subjects as $subj) {
             Subject::firstOrCreate(['code' => $subj['code']], $subj);
         }
 
-        // ── Attach Subjects to BSIT Program (Curriculum) ──
+        // ── Attach Subjects to Junior High and BSIT Programs ──
+        $grade7Program = Program::where('code', 'JHS-G7')->first();
+        if ($grade7Program) {
+            $grade7Curriculum = [
+                'JHS7-ENG' => ['year_level' => 7, 'semester' => 1],
+                'JHS7-MATH' => ['year_level' => 7, 'semester' => 1],
+                'JHS7-SCI' => ['year_level' => 7, 'semester' => 1],
+                'JHS7-FIL' => ['year_level' => 7, 'semester' => 1],
+                'JHS7-AP' => ['year_level' => 7, 'semester' => 1],
+                'JHS7-TLE' => ['year_level' => 7, 'semester' => 1],
+                'JHS7-ESP' => ['year_level' => 7, 'semester' => 1],
+                'JHS7-MAPEH' => ['year_level' => 7, 'semester' => 1],
+            ];
+
+            foreach ($grade7Curriculum as $code => $pivot) {
+                $subject = Subject::where('code', $code)->first();
+                if ($subject && !$grade7Program->subjects()->where('subject_id', $subject->id)->exists()) {
+                    $grade7Program->subjects()->attach($subject->id, $pivot);
+                }
+            }
+        }
+
         $bsit = Program::where('code', 'BSIT')->first();
         if ($bsit) {
             $curriculum = [
@@ -243,10 +297,10 @@ class DatabaseSeeder extends Seeder
 
         // Assign subjects to section with faculty
         $subjectAssignments = [
-            'IT101' => ['faculty' => $faculty,  'schedule' => 'MWF 8:00-9:00 AM',  'room' => 'Room 101'],
-            'IT102' => ['faculty' => $faculty,  'schedule' => 'TTh 9:00-10:30 AM', 'room' => 'Lab 1'],
-            'GE101' => ['faculty' => $faculty2, 'schedule' => 'MWF 10:00-11:00 AM', 'room' => 'Room 201'],
-            'GE102' => ['faculty' => $faculty2, 'schedule' => 'TTh 1:00-2:30 PM',  'room' => 'Room 202'],
+            'JHS7-MATH' => ['faculty' => $faculty,  'schedule' => 'MWF 8:00-9:00 AM',   'room' => 'Room 101'],
+            'JHS7-ENG' => ['faculty' => $faculty,   'schedule' => 'MWF 9:00-10:00 AM',  'room' => 'Room 101'],
+            'JHS7-SCI' => ['faculty' => $faculty2,  'schedule' => 'TTh 10:00-11:30 AM', 'room' => 'Science Lab'],
+            'JHS7-FIL' => ['faculty' => $faculty2,  'schedule' => 'TTh 1:00-2:30 PM',   'room' => 'Room 202'],
         ];
 
         foreach ($subjectAssignments as $code => $info) {

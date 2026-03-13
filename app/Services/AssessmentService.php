@@ -8,23 +8,21 @@ use App\Models\TuitionStructure;
 class AssessmentService
 {
     /**
-     * Generate assessment (tuition computation) for an enrollment.
-     * Resolves the active TuitionStructure for the student's department + academic year,
-     * locks it on the enrollment record, and computes the total.
+     * Resolve the applicable tuition structure for an enrollment.
      *
-     * @throws \RuntimeException if no active tuition structure is found
+     * @throws \RuntimeException if the enrollment is missing required context or no active structure exists
      */
-    public function generateAssessment(Enrollment $enrollment): Enrollment
+    public function resolveStructure(Enrollment $enrollment): TuitionStructure
     {
-        $enrollment->load([
+        $enrollment->loadMissing([
             'enrollmentSubjects.subject',
             'semester.academicYear',
             'student.section.gradeLevel.department',
         ]);
 
-        $semester    = $enrollment->semester;
+        $semester = $enrollment->semester;
         $academicYear = $semester?->academicYear;
-        $department  = $enrollment->student?->section?->gradeLevel?->department;
+        $department = $enrollment->student?->section?->gradeLevel?->department;
 
         if (!$academicYear) {
             throw new \RuntimeException('Enrollment has no associated academic year.');
@@ -41,6 +39,20 @@ class AssessmentService
                 "No active tuition structure found for department \"{$department->name}\" in academic year \"{$academicYear->name}\"."
             );
         }
+
+        return $structure;
+    }
+
+    /**
+     * Generate assessment (tuition computation) for an enrollment.
+     * Resolves the active TuitionStructure for the student's department + academic year,
+     * locks it on the enrollment record, and computes the total.
+     *
+     * @throws \RuntimeException if no active tuition structure is found
+     */
+    public function generateAssessment(Enrollment $enrollment): Enrollment
+    {
+        $structure = $this->resolveStructure($enrollment);
 
         $totalAmount = $structure->computeTotal($enrollment->enrollmentSubjects);
 
@@ -81,6 +93,13 @@ class AssessmentService
             return [];
         }
 
+        $computedTotal = $structure->computeTotal($enrollment->enrollmentSubjects);
+        $effectiveTotal = (float) $enrollment->total_amount > 0
+            ? (float) $enrollment->total_amount
+            : $computedTotal;
+        $totalPaid = $enrollment->totalPaid();
+        $balance = $effectiveTotal - $totalPaid;
+
         $miscFee = (float) $structure->misc_fee;
         $regFee  = (float) $structure->reg_fee;
 
@@ -90,9 +109,9 @@ class AssessmentService
                 'flat_amount'  => (float) $structure->flat_amount,
                 'misc_fee'     => $miscFee,
                 'reg_fee'      => $regFee,
-                'total'        => $enrollment->total_amount,
-                'total_paid'   => $enrollment->totalPaid(),
-                'balance'      => $enrollment->balance(),
+                'total'        => $effectiveTotal,
+                'total_paid'   => $totalPaid,
+                'balance'      => $balance,
                 'structure'    => $structure,
             ];
         }
@@ -123,9 +142,9 @@ class AssessmentService
             'items'        => $items,
             'misc_fee'     => $miscFee,
             'reg_fee'      => $regFee,
-            'total'        => $enrollment->total_amount,
-            'total_paid'   => $enrollment->totalPaid(),
-            'balance'      => $enrollment->balance(),
+            'total'        => $effectiveTotal,
+            'total_paid'   => $totalPaid,
+            'balance'      => $balance,
             'structure'    => $structure,
         ];
     }

@@ -32,13 +32,23 @@ return new class extends Migration
 
         // ─── 3. Clear dependent data (dev environment) ────────────
         // Sections are being fully restructured; clear related records
-        DB::statement('SET FOREIGN_KEY_CHECKS=0');
-        DB::table('grades')->truncate();
-        DB::table('enrollment_subjects')->truncate();
-        DB::table('enrollments')->truncate();
-        DB::table('payments')->truncate();
-        DB::table('sections')->truncate();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1');
+        if (Schema::getConnection()->getDriverName() === 'sqlite') {
+            Schema::disableForeignKeyConstraints();
+            DB::table('grades')->delete();
+            DB::table('enrollment_subjects')->delete();
+            DB::table('enrollments')->delete();
+            DB::table('payments')->delete();
+            DB::table('sections')->delete();
+            Schema::enableForeignKeyConstraints();
+        } else {
+            DB::statement('SET FOREIGN_KEY_CHECKS=0');
+            DB::table('grades')->truncate();
+            DB::table('enrollment_subjects')->truncate();
+            DB::table('enrollments')->truncate();
+            DB::table('payments')->truncate();
+            DB::table('sections')->truncate();
+            DB::statement('SET FOREIGN_KEY_CHECKS=1');
+        }
 
         // ─── 4. Restructure sections table ────────────────────────
         Schema::table('sections', function (Blueprint $table) {
@@ -50,8 +60,13 @@ return new class extends Migration
 
             // Drop old columns
             $table->dropColumn([
-                'semester_id', 'program_id', 'subject_id', 'faculty_id',
-                'year_level', 'schedule', 'room',
+                'semester_id',
+                'program_id',
+                'subject_id',
+                'faculty_id',
+                'year_level',
+                'schedule',
+                'room',
             ]);
         });
 

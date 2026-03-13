@@ -69,6 +69,14 @@ class LoginController extends Controller
             return redirect()->route('student.dashboard');
         }
 
+        if ($user->hasRole('guidance')) {
+            return redirect()->route('guidance.dashboard');
+        }
+
+        if ($user->hasRole('cashier')) {
+            return redirect()->route('cashier.dashboard');
+        }
+
         // Fallback
         return redirect('/');
     }

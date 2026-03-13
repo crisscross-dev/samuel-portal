@@ -22,10 +22,31 @@ class ApplicationController extends Controller
      */
     public function index(Request $request): View
     {
-        $query = Application::with('program', 'reviewer', 'admissionPayment');
+        $query = Application::with('program', 'reviewer', 'examReviewer', 'guidanceUser', 'requirementsVerifier', 'enrollmentProcessor', 'admissionPayment');
+        $stageGroup = $request->string('stage_group')->toString();
+
+        if ($stageGroup !== '') {
+            match ($stageGroup) {
+                'admission' => $query->where('workflow_stage', Application::WORKFLOW_SUBMITTED),
+                'exam' => $query->whereIn('workflow_stage', [
+                    Application::WORKFLOW_EXAM_APPROVED,
+                    Application::WORKFLOW_EXAM_FAILED,
+                ]),
+                'requirements' => $query->whereIn('workflow_stage', [
+                    Application::WORKFLOW_REGISTRAR_REQUIREMENTS,
+                    Application::WORKFLOW_ENROLLMENT,
+                    Application::WORKFLOW_CASHIER_PAYMENT,
+                ]),
+                default => null,
+            };
+        }
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
+        }
+
+        if ($request->filled('workflow_stage')) {
+            $query->where('workflow_stage', $request->workflow_stage);
         }
 
         if ($request->filled('program_id')) {
@@ -47,12 +68,37 @@ class ApplicationController extends Controller
 
         $stats = [
             'pending'  => Application::pending()->count(),
-            'approved' => Application::approved()->count(),
-            'rejected' => Application::rejected()->count(),
+            'exam_approved' => Application::workflowStage(Application::WORKFLOW_EXAM_APPROVED)->count(),
+            'guidance_review' => Application::workflowStage(Application::WORKFLOW_GUIDANCE_REVIEW)->count(),
+            'registrar_requirements' => Application::workflowStage(Application::WORKFLOW_REGISTRAR_REQUIREMENTS)->count(),
+            'enrollment' => Application::workflowStage(Application::WORKFLOW_ENROLLMENT)->count(),
+            'cashier' => Application::workflowStage(Application::WORKFLOW_CASHIER_PAYMENT)->count(),
+            'inactive' => Application::where('is_active', false)->count(),
             'total'    => Application::count(),
         ];
 
-        return view('registrar.applications.index', compact('applications', 'programs', 'stats'));
+        $stageGroupMeta = [
+            'admission' => [
+                'title' => 'Admission Queue',
+                'description' => 'Verify student payment submissions and review applications before clearing applicants for the entrance exam.',
+            ],
+            'exam' => [
+                'title' => 'Exam Queue',
+                'description' => 'Manage students approved for the entrance exam and record pass or fail results before they move to the next office.',
+            ],
+            'requirements' => [
+                'title' => 'Requirements Queue',
+                'description' => 'Review interview passers, verify documentary requirements, process enrollment, and forward records to Cashier.',
+            ],
+            'all' => [
+                'title' => 'Admission Applications',
+                'description' => 'Track every registrar-side admission workflow stage in one place.',
+            ],
+        ];
+
+        $selectedStageGroup = array_key_exists($stageGroup, $stageGroupMeta) ? $stageGroup : 'all';
+
+        return view('registrar.applications.index', compact('applications', 'programs', 'stats', 'selectedStageGroup', 'stageGroupMeta'));
     }
 
     /**
@@ -60,7 +106,7 @@ class ApplicationController extends Controller
      */
     public function show(Application $application): View
     {
-        $application->load('program', 'reviewer', 'admissionPayment.verifier', 'examSchedule');
+        $application->load('program', 'reviewer', 'examReviewer', 'guidanceUser', 'interviewEvaluator', 'requirementsVerifier', 'enrollmentProcessor', 'admissionPayment.verifier', 'examSchedule');
 
         $activeSchedules = ExamSchedule::active()->withCount('applications')->orderBy('exam_date')->orderBy('time_slot')->get();
 
@@ -88,7 +134,9 @@ class ApplicationController extends Controller
             'verified_at'    => now(),
         ]);
 
-        return back()->with('success', 'Payment verified successfully. You may now approve the application.');
+        $application->update(['payment_status' => 'paid']);
+
+        return back()->with('success', 'Payment verified successfully. You may now clear the applicant for the entrance exam.');
     }
 
     /**
@@ -106,19 +154,97 @@ class ApplicationController extends Controller
     }
 
     /**
-     * Approve an application — creates user account + student profile.
+     * Approve an application for the entrance examination.
      */
     public function approve(Request $request, Application $application): RedirectResponse
     {
         try {
-            $student = $this->admissionService->approveApplication(
+            $this->admissionService->approveForExam(
                 $application,
                 Auth::id(),
                 $request->input('remarks')
             );
 
             return redirect()->route('registrar.applications.index')
-                ->with('success', "Application approved. Student account created — ID: {$student->student_id}, Default password: password");
+                ->with('success', 'Application approved for the entrance exam and the applicant has been emailed. No student account has been created yet.');
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
+    /**
+     * Record the entrance exam result.
+     */
+    public function recordExamResult(Request $request, Application $application): RedirectResponse
+    {
+        $request->validate([
+            'exam_result' => ['required', 'in:passed,failed'],
+            'exam_remarks' => ['nullable', 'string', 'max:2000'],
+        ]);
+
+        try {
+            $updated = $this->admissionService->recordExamResult(
+                $application,
+                Auth::id(),
+                $request->string('exam_result')->toString(),
+                $request->input('exam_remarks')
+            );
+
+            $message = $updated->exam_result === Application::EXAM_RESULT_PASSED
+                ? 'Applicant passed the exam and has been forwarded to the Guidance Office.'
+                : 'Applicant failed the entrance exam and the record was moved to the archive.';
+
+            return back()->with('success', $message);
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
+    public function verifyRequirements(Request $request, Application $application): RedirectResponse
+    {
+        $requirements = [
+            'pre_enrolment_form_submitted' => $request->boolean('pre_enrolment_form_submitted'),
+            'student_health_form_submitted' => $request->boolean('student_health_form_submitted'),
+            'report_card_submitted' => $request->boolean('report_card_submitted'),
+            'id_picture_submitted' => $request->boolean('id_picture_submitted'),
+        ];
+
+        $request->validate([
+            'requirements_remarks' => ['nullable', 'string', 'max:2000'],
+        ]);
+
+        try {
+            $updated = $this->admissionService->verifyRequirements(
+                $application,
+                Auth::id(),
+                $requirements,
+                $request->input('requirements_remarks')
+            );
+
+            $message = $updated->isInEnrollmentStage()
+                ? 'Requirements verified. The applicant is now in the enrollment stage.'
+                : 'Requirements checklist saved. Complete all required documents to move the applicant to enrollment.';
+
+            return back()->with('success', $message);
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
+    public function processEnrollment(Request $request, Application $application): RedirectResponse
+    {
+        $request->validate([
+            'enrollment_remarks' => ['nullable', 'string', 'max:2000'],
+        ]);
+
+        try {
+            $this->admissionService->processEnrollment(
+                $application,
+                Auth::id(),
+                $request->input('enrollment_remarks')
+            );
+
+            return back()->with('success', 'Enrollment processed. The applicant has been forwarded to Cashier for payment.');
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }

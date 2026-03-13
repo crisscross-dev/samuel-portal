@@ -104,21 +104,41 @@
                         <td>{{ $application->created_at->format('M d, Y') }}</td>
                     </tr>
                     <tr>
-                        <td class="text-muted">Status</td>
+                        <td class="text-muted">Workflow</td>
                         <td>
                             @php
-                            $badge = match($application->status) {
-                            'approved' => 'success',
-                            'rejected' => 'danger',
-                            default => 'warning',
+                            $workflowBadge = match($application->workflow_stage) {
+                            'exam_approved' => 'bg-info',
+                            'guidance_review' => 'bg-primary',
+                            'interview_scheduled' => 'bg-warning text-dark',
+                            'interview_form_submitted' => 'bg-success',
+                            'registrar_requirements' => 'bg-primary',
+                            'enrollment' => 'bg-success',
+                            'cashier_payment' => 'bg-dark',
+                            'archived' => 'bg-secondary',
+                            'exam_failed', 'rejected' => 'bg-danger',
+                            default => 'bg-secondary',
                             };
                             @endphp
-                            <span class="badge bg-{{ $badge }} fs-6">
-                                <i class="fas fa-{{ $application->status === 'approved' ? 'circle-check' : ($application->status === 'rejected' ? 'circle-xmark' : 'hourglass-half') }} me-1"></i>
-                                {{ ucfirst($application->status) }}
-                            </span>
+                            <span class="badge {{ $workflowBadge }} fs-6">{{ $application->workflowLabel() }}</span>
                         </td>
                     </tr>
+                    <tr>
+                        <td class="text-muted">Exam Result</td>
+                        <td>{{ $application->examResultLabel() }}</td>
+                    </tr>
+                    @if($application->interview_result)
+                    <tr>
+                        <td class="text-muted">Interview Result</td>
+                        <td>{{ $application->interviewResultLabel() }}</td>
+                    </tr>
+                    @endif
+                    @if($application->interview_date)
+                    <tr>
+                        <td class="text-muted">Interview Date</td>
+                        <td>{{ $application->interview_date->format('F d, Y') }}</td>
+                    </tr>
+                    @endif
                     <tr>
                         <td class="text-muted">Payment</td>
                         <td>
@@ -169,10 +189,50 @@
                 @endif
                 @endif
 
-                @if($application->isApproved())
+                @if($application->isExamApproved())
                 <div class="alert alert-success mt-3 mb-0 small">
                     <i class="fas fa-circle-check me-1"></i>
-                    Your application has been approved! Please check your email for login credentials or visit the Registrar's Office.
+                    You are approved to take the entrance examination. Please attend your assigned exam schedule.
+                </div>
+                @elseif($application->isForwardedToGuidance())
+                <div class="alert alert-primary mt-3 mb-0 small">
+                    <i class="fas fa-share me-1"></i>
+                    You passed the entrance exam and your record has been forwarded to the Guidance Office.
+                </div>
+                @elseif($application->hasInterviewScheduled())
+                <div class="alert alert-warning mt-3 mb-0 small">
+                    <i class="fas fa-calendar-day me-1"></i>
+                    Your guidance interview is scheduled on {{ $application->interview_date?->format('F d, Y') }}. Check your email for the form link.
+                </div>
+                @elseif($application->hasSubmittedInterviewForm())
+                <div class="alert alert-success mt-3 mb-0 small">
+                    <i class="fas fa-file-circle-check me-1"></i>
+                    Your guidance form has been submitted. Please wait for the next admission update.
+                </div>
+                @elseif($application->isInRegistrarRequirements())
+                <div class="alert alert-primary mt-3 mb-0 small">
+                    <i class="fas fa-folder-open me-1"></i>
+                    You passed the guidance interview. The Registrar is now verifying your admission requirements.
+                </div>
+                @elseif($application->isInEnrollmentStage())
+                <div class="alert alert-success mt-3 mb-0 small">
+                    <i class="fas fa-user-check me-1"></i>
+                    Your requirements are complete and your record is now in the enrollment stage.
+                </div>
+                @elseif($application->isInCashierStage())
+                <div class="alert alert-dark mt-3 mb-0 small">
+                    <i class="fas fa-cash-register me-1"></i>
+                    Your enrollment has been processed and your record has been forwarded to Cashier for payment.
+                </div>
+                @elseif($application->isArchivedRecord())
+                <div class="alert alert-secondary mt-3 mb-0 small">
+                    <i class="fas fa-box-archive me-1"></i>
+                    Your application was archived after the interview evaluation. Please contact the Guidance Office for details.
+                </div>
+                @elseif($application->workflow_stage === 'exam_failed')
+                <div class="alert alert-danger mt-3 mb-0 small">
+                    <i class="fas fa-circle-xmark me-1"></i>
+                    You did not pass the entrance examination. Your record remains on file for reference.
                 </div>
                 @elseif($application->isRejected())
                 <div class="alert alert-danger mt-3 mb-0 small">

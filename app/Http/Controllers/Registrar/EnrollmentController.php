@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Registrar;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Registrar\StoreEnrollmentRequest;
+use App\Models\Application;
 use App\Models\Enrollment;
 use App\Models\Section;
 use App\Models\Semester;
 use App\Models\Student;
+use App\Services\AdmissionService;
 use App\Services\AssessmentService;
 use App\Services\EnrollmentService;
 use Illuminate\Http\RedirectResponse;
@@ -19,28 +21,37 @@ class EnrollmentController extends Controller
     public function __construct(
         private EnrollmentService $enrollmentService,
         private AssessmentService $assessmentService,
+        private AdmissionService $admissionService,
     ) {}
 
     public function index(Request $request): View
     {
-        $query = Enrollment::with(['student.user', 'semester.academicYear']);
+        $enrollmentCandidates = Application::with('program')
+            ->where('workflow_stage', Application::WORKFLOW_ENROLLMENT)
+            ->latest('requirements_verified_at')
+            ->get();
 
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
-        if ($request->filled('semester_id')) {
-            $query->where('semester_id', $request->semester_id);
-        }
-
-        $enrollments = $query->latest()->paginate(15);
-        $semesters = Semester::with('academicYear')->latest()->get();
-
-        return view('registrar.enrollments.index', compact('enrollments', 'semesters'));
+        return view('registrar.enrollments.index', compact('enrollmentCandidates'));
     }
 
-    public function create(): View
+    public function create(Request $request): View
     {
+        $application = null;
+        $selectedStudent = null;
+
+        if ($request->filled('application_id')) {
+            $application = Application::with('program')
+                ->findOrFail($request->integer('application_id'));
+
+            if (!$application->isInEnrollmentStage()) {
+                abort(404);
+            }
+
+            $selectedStudent = Student::whereHas('user', fn($query) => $query->where('email', $application->email))
+                ->with('user', 'program')
+                ->first();
+        }
+
         $students = Student::with('user')
             ->enrollable()
             ->get();
@@ -50,25 +61,42 @@ class EnrollmentController extends Controller
         $activeAY = \App\Models\AcademicYear::where('is_active', true)->first();
         $sections = $activeAY
             ? Section::with(['gradeLevel.department', 'adviser.user'])
-                ->where('academic_year_id', $activeAY->id)
-                ->withCount('students')
-                ->get()
+            ->where('academic_year_id', $activeAY->id)
+            ->withCount('students')
+            ->get()
             : collect();
 
-        return view('registrar.enrollments.create', compact('students', 'semester', 'sections'));
+        return view('registrar.enrollments.create', compact('students', 'semester', 'sections', 'application', 'selectedStudent'));
     }
 
     public function store(StoreEnrollmentRequest $request): RedirectResponse
     {
         try {
+            $studentId = (int) $request->student_id;
+
+            if ($request->filled('application_id')) {
+                $application = Application::with('program')->findOrFail($request->integer('application_id'));
+                $student = $this->admissionService->ensureStudentForEnrollment($application);
+                $studentId = $student->id;
+            }
+
             $enrollment = $this->enrollmentService->createEnrollment(
-                $request->student_id,
+                $studentId,
                 $request->semester_id,
                 $request->section_id
             );
 
+            if ($request->filled('application_id')) {
+                $application = Application::findOrFail($request->integer('application_id'));
+                $this->admissionService->processEnrollment(
+                    $application,
+                    $request->user()->id,
+                    'Enrollment created via registrar enrollment module.'
+                );
+            }
+
             return redirect()->route('registrar.enrollments.show', $enrollment)
-                ->with('success', 'Enrollment created successfully. Proceed to assessment.');
+                ->with('success', 'Enrollment created successfully. The applicant has been forwarded to Cashier for payment.');
         } catch (\Exception $e) {
             return back()->withInput()->with('error', $e->getMessage());
         }

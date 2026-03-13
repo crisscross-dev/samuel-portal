@@ -22,9 +22,9 @@ return new class extends Migration
 
             // ── Academic Details ────────────────────────────
             $table->foreignId('program_applied_id')
-                  ->constrained('programs')
-                  ->cascadeOnUpdate()
-                  ->restrictOnDelete();
+                ->constrained('programs')
+                ->cascadeOnUpdate()
+                ->restrictOnDelete();
             $table->unsignedTinyInteger('year_level')->default(1);
 
             // ── Guardian / Emergency Contact ────────────────
@@ -50,17 +50,21 @@ return new class extends Migration
 
         // ── Update students.status enum to include 'admitted' & 'suspended' ──
         // Laravel doesn't natively support ALTER ENUM easily, so we use raw SQL
-        \Illuminate\Support\Facades\DB::statement(
-            "ALTER TABLE students MODIFY COLUMN status ENUM('applicant','admitted','active','inactive','suspended','graduated','dropped') DEFAULT 'admitted'"
-        );
+        if (Schema::getConnection()->getDriverName() !== 'sqlite') {
+            \Illuminate\Support\Facades\DB::statement(
+                "ALTER TABLE students MODIFY COLUMN status ENUM('applicant','admitted','active','inactive','suspended','graduated','dropped') DEFAULT 'admitted'"
+            );
+        }
     }
 
     public function down(): void
     {
         Schema::dropIfExists('applications');
 
-        \Illuminate\Support\Facades\DB::statement(
-            "ALTER TABLE students MODIFY COLUMN status ENUM('applicant','active','inactive','graduated','dropped') DEFAULT 'applicant'"
-        );
+        if (Schema::getConnection()->getDriverName() !== 'sqlite') {
+            \Illuminate\Support\Facades\DB::statement(
+                "ALTER TABLE students MODIFY COLUMN status ENUM('applicant','active','inactive','graduated','dropped') DEFAULT 'applicant'"
+            );
+        }
     }
 };

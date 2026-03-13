@@ -73,6 +73,8 @@ class AdmissionPaymentController extends Controller
             ])
         );
 
+        $application->update(['payment_status' => 'pending']);
+
         $application->refresh();
 
         return redirect()->route('admission.success')

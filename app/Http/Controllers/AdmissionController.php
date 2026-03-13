@@ -6,11 +6,17 @@ use App\Http\Requests\StoreApplicationRequest;
 use App\Models\Application;
 use App\Models\ExamSchedule;
 use App\Models\Program;
+use App\Services\AdmissionService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class AdmissionController extends Controller
 {
+    public function __construct(
+        protected AdmissionService $admissionService,
+    ) {}
+
     /**
      * Show the public admission application form.
      */
@@ -177,5 +183,42 @@ class AdmissionController extends Controller
             ->first();
 
         return view('admission.track', compact('application'));
+    }
+
+    /**
+     * Show the guidance interview follow-up form.
+     */
+    public function showInterviewForm(string $token): View
+    {
+        $application = Application::with('program')
+            ->where('interview_form_token', $token)
+            ->firstOrFail();
+
+        return view('admission.interview_form', compact('application'));
+    }
+
+    /**
+     * Submit the guidance interview follow-up form.
+     */
+    public function submitInterviewForm(Request $request, string $token): RedirectResponse
+    {
+        $application = Application::where('interview_form_token', $token)->firstOrFail();
+
+        $data = $request->validate([
+            'middle_name' => ['nullable', 'string', 'max:255'],
+            'lrn' => ['nullable', 'string', 'max:12'],
+            'contact_number' => ['required', 'string', 'max:20'],
+            'address' => ['required', 'string', 'max:1000'],
+            'nationality' => ['required', 'string', 'max:100'],
+            'religion' => ['nullable', 'string', 'max:100'],
+            'guardian_name' => ['required', 'string', 'max:255'],
+            'guardian_contact' => ['required', 'string', 'max:20'],
+            'guardian_relationship' => ['required', 'string', 'max:100'],
+            'elementary_school' => ['required', 'string', 'max:255'],
+        ]);
+
+        $this->admissionService->submitInterviewForm($application, $data);
+
+        return back()->with('success', 'Your interview form has been submitted successfully.');
     }
 }

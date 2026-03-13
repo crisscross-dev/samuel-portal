@@ -6,7 +6,7 @@
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     background: #f4f6f9;
 }
 
@@ -50,6 +50,30 @@ body {
 .sidebar .nav-link:hover,
 .sidebar .nav-link.active {
     background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+}
+
+.sidebar .nav-submenu {
+    display: grid;
+    gap: 0.15rem;
+    margin: -0.1rem 0.5rem 0.45rem 2.25rem;
+}
+
+.sidebar .nav-sublink {
+    color: rgba(255, 255, 255, 0.72);
+    padding: 0.45rem 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-size: 0.84rem;
+    border-radius: 0.35rem;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.sidebar .nav-sublink:hover,
+.sidebar .nav-sublink.active {
+    background: rgba(255, 255, 255, 0.16);
     color: #fff;
 }
 

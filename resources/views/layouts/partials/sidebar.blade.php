@@ -40,9 +40,23 @@
         <a href="{{ route('registrar.dashboard') }}" class="nav-link {{ request()->routeIs('registrar.dashboard') ? 'active' : '' }}">
             <i class="bi bi-speedometer2"></i> Dashboard
         </a>
-        <a href="{{ route('registrar.applications.index') }}" class="nav-link {{ request()->routeIs('registrar.applications.*') ? 'active' : '' }}">
+        <a href="{{ route('registrar.applications.index') }}" class="nav-link {{ request()->routeIs('registrar.applications.*') || request()->routeIs('registrar.enrollments.*') ? 'active' : '' }}">
             <i class="bi bi-file-earmark-person"></i> Applications
         </a>
+        <div class="nav-submenu {{ request()->routeIs('registrar.applications.*') || request()->routeIs('registrar.enrollments.*') ? 'show' : '' }}">
+            <a href="{{ route('registrar.applications.index', ['stage_group' => 'admission']) }}" class="nav-sublink {{ request()->routeIs('registrar.applications.index') && request('stage_group') === 'admission' ? 'active' : '' }}">
+                <i class="bi bi-credit-card-2-front"></i> Admission
+            </a>
+            <a href="{{ route('registrar.applications.index', ['stage_group' => 'exam']) }}" class="nav-sublink {{ request()->routeIs('registrar.applications.index') && request('stage_group') === 'exam' ? 'active' : '' }}">
+                <i class="bi bi-journal-text"></i> Exam
+            </a>
+            <a href="{{ route('registrar.applications.index', ['stage_group' => 'requirements']) }}" class="nav-sublink {{ request()->routeIs('registrar.applications.index') && request('stage_group') === 'requirements' ? 'active' : '' }}">
+                <i class="bi bi-folder-check"></i> Requirements
+            </a>
+            <a href="{{ route('registrar.enrollments.index') }}" class="nav-sublink {{ request()->routeIs('registrar.enrollments.*') ? 'active' : '' }}">
+                <i class="bi bi-journal-check"></i> Enrollment
+            </a>
+        </div>
         <a href="{{ route('registrar.exam-schedules.index') }}" class="nav-link {{ request()->routeIs('registrar.exam-schedules.*') ? 'active' : '' }}">
             <i class="bi bi-calendar-event"></i> Exam Schedules
         </a>
@@ -61,13 +75,7 @@
             <i class="bi bi-collection"></i> Sections
         </a>
 
-        <div class="nav-section">Enrollment</div>
-        <a href="{{ route('registrar.enrollments.index') }}" class="nav-link {{ request()->routeIs('registrar.enrollments.*') ? 'active' : '' }}">
-            <i class="bi bi-journal-check"></i> Enrollments
-        </a>
-        <a href="{{ route('registrar.payments.index') }}" class="nav-link {{ request()->routeIs('registrar.payments.*') ? 'active' : '' }}">
-            <i class="bi bi-credit-card"></i> Payments
-        </a>
+        <div class="nav-section">Academic Records</div>
         <a href="{{ route('registrar.grades.index') }}" class="nav-link {{ request()->routeIs('registrar.grades.index') || request()->routeIs('registrar.grades.reopen*') ? 'active' : '' }}">
             <i class="bi bi-clipboard-data"></i> Grades
         </a>
@@ -78,6 +86,18 @@
             <i class="bi bi-tags"></i> Tuition Pricing
         </a>
 
+        @elseif(auth()->user()->hasRole('cashier'))
+        <div class="nav-section">Cashier</div>
+        <a href="{{ route('cashier.dashboard') }}" class="nav-link {{ request()->routeIs('cashier.dashboard') ? 'active' : '' }}">
+            <i class="bi bi-speedometer2"></i> Dashboard
+        </a>
+        <a href="{{ route('cashier.payments.index') }}" class="nav-link {{ request()->routeIs('cashier.payments.index') || request()->routeIs('cashier.payments.create') ? 'active' : '' }}">
+            <i class="bi bi-credit-card"></i> Payments
+        </a>
+        <a href="{{ route('cashier.payments.logs') }}" class="nav-link {{ request()->routeIs('cashier.payments.logs') ? 'active' : '' }}">
+            <i class="bi bi-clock-history"></i> Payment Logs
+        </a>
+
         @elseif(auth()->user()->hasRole('faculty'))
         <div class="nav-section">Faculty</div>
         <a href="{{ route('faculty.dashboard') }}" class="nav-link {{ request()->routeIs('faculty.dashboard') ? 'active' : '' }}">
@@ -86,6 +106,26 @@
         <a href="{{ route('faculty.sections.index') }}" class="nav-link {{ request()->routeIs('faculty.sections.*') || request()->routeIs('faculty.grades.*') ? 'active' : '' }}">
             <i class="bi bi-collection"></i> Teaching Loads
         </a>
+
+        @elseif(auth()->user()->hasRole('guidance'))
+        <div class="nav-section">Guidance</div>
+        <a href="{{ route('guidance.dashboard') }}" class="nav-link {{ request()->routeIs('guidance.dashboard') ? 'active' : '' }}">
+            <i class="bi bi-speedometer2"></i> Dashboard
+        </a>
+        <a href="{{ route('guidance.applications.index') }}" class="nav-link {{ request()->routeIs('guidance.applications.*') ? 'active' : '' }}">
+            <i class="bi bi-person-lines-fill"></i> Interviews
+        </a>
+        <div class="nav-submenu {{ request()->routeIs('guidance.applications.*') ? 'show' : '' }}">
+            <a href="{{ route('guidance.applications.index') }}" class="nav-sublink {{ request()->routeIs('guidance.applications.index') ? 'active' : '' }}">
+                <i class="bi bi-list-task"></i> Interview Queue
+            </a>
+            <a href="{{ route('guidance.applications.results') }}" class="nav-sublink {{ request()->routeIs('guidance.applications.results') ? 'active' : '' }}">
+                <i class="bi bi-clipboard2-check"></i> Interview Remarks
+            </a>
+            <a href="{{ route('guidance.applications.logs') }}" class="nav-sublink {{ request()->routeIs('guidance.applications.logs') ? 'active' : '' }}">
+                <i class="bi bi-journal-text"></i> Interview Log
+            </a>
+        </div>
 
         @elseif(auth()->user()->hasRole('student'))
         <div class="nav-section">Student Portal</div>

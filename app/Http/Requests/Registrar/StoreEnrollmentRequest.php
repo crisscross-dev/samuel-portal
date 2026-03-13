@@ -14,7 +14,8 @@ class StoreEnrollmentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'student_id'    => ['required', 'exists:students,id'],
+            'student_id'    => ['nullable', 'required_without:application_id', 'exists:students,id'],
+            'application_id' => ['nullable', 'required_without:student_id', 'exists:applications,id'],
             'semester_id'   => ['required', 'exists:semesters,id'],
             'section_id'    => ['required', 'exists:sections,id'],
         ];
