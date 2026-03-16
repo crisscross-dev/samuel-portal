@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreApplicationRequest;
 use App\Models\Application;
 use App\Models\ExamSchedule;
+use App\Models\GuidanceInterviewSlot;
 use App\Models\Program;
 use App\Services\AdmissionService;
 use Illuminate\Http\RedirectResponse;
@@ -297,8 +298,13 @@ class AdmissionController extends Controller
             ->firstOrFail();
 
         $formType = $this->resolveInterviewFormType($application);
+        $availableSlots = GuidanceInterviewSlot::available()
+            ->where('form_type', $formType)
+            ->orderBy('interview_date')
+            ->orderBy('start_time')
+            ->get();
 
-        return view('admission.interview_form', compact('application', 'formType'));
+        return view('admission.interview_form', compact('application', 'formType', 'availableSlots'));
     }
 
     /**
@@ -309,6 +315,10 @@ class AdmissionController extends Controller
         $application = Application::with('program')
             ->where('interview_form_token', $token)
             ->firstOrFail();
+
+        if ($application->interview_form_submitted_at) {
+            return back()->with('error', 'Interview form can only be submitted once.');
+        }
 
         $formType = $this->resolveInterviewFormType($application);
         $isShs = $formType === 'shs';
@@ -341,6 +351,7 @@ class AdmissionController extends Controller
             'elective_course' => $isShs && !$isGrade12 ? ['required', 'string', 'max:255'] : ['nullable', 'string', 'max:255'],
             'strand' => $isShs && $isGrade12 ? ['required', 'string', 'max:100'] : ['nullable', 'string', 'max:100'],
             'last_year_section' => $isShs && $isGrade12 ? ['required', 'string', 'max:100'] : ['nullable', 'string', 'max:100'],
+            'interview_slot_id' => ['required', 'integer', 'exists:guidance_interview_slots,id'],
         ]);
 
         $payload = [
@@ -376,6 +387,7 @@ class AdmissionController extends Controller
             'guardian_relationship' => $validated['guardian_relationship'],
             'elementary_school' => $validated['elementary_school'],
             'interview_form_data' => $payload,
+            'interview_slot_id' => (int) $validated['interview_slot_id'],
         ];
 
         $this->admissionService->submitInterviewForm($application, $updateData);

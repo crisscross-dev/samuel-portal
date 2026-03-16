@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Mail\EntranceExamApprovedMail;
 use App\Mail\InterviewScheduleMail;
 use App\Models\Application;
+use App\Models\GuidanceInterviewSlot;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -129,18 +130,20 @@ class AdmissionService
      *
      * @throws \Exception
      */
-    public function scheduleInterview(Application $application, mixed $guidanceUserId, string $interviewDate, ?string $remarks = null): Application
+    public function scheduleInterview(Application $application, mixed $guidanceUserId, ?string $remarks = null): Application
     {
-        if (!$application->canScheduleInterview()) {
-            throw new \Exception('Only applicants forwarded to Guidance can be scheduled for interview.');
+        if (!in_array($application->workflow_stage, [
+            Application::WORKFLOW_GUIDANCE_REVIEW,
+            Application::WORKFLOW_INTERVIEW_FORM_SUBMITTED,
+        ], true)) {
+            throw new \Exception('Only queued or submitted guidance cases can receive a form link.');
         }
 
-        $result = DB::transaction(function () use ($application, $guidanceUserId, $interviewDate, $remarks) {
+        $result = DB::transaction(function () use ($application, $guidanceUserId, $remarks) {
             $token = $application->interview_form_token ?: Str::random(64);
 
             $application->update([
-                'workflow_stage' => Application::WORKFLOW_INTERVIEW_SCHEDULED,
-                'interview_date' => $interviewDate,
+                'workflow_stage' => Application::WORKFLOW_GUIDANCE_REVIEW,
                 'guidance_user_id' => $guidanceUserId ? (int) $guidanceUserId : null,
                 'guidance_remarks' => $remarks,
                 'interview_form_token' => $token,
@@ -164,13 +167,43 @@ class AdmissionService
      */
     public function submitInterviewForm(Application $application, array $data): Application
     {
-        $application->update(array_merge($data, [
-            'workflow_stage' => Application::WORKFLOW_INTERVIEW_FORM_SUBMITTED,
-            'interview_form_submitted_at' => now(),
-            'is_active' => true,
-        ]));
+        return DB::transaction(function () use ($application, $data) {
+            $lockedApplication = Application::whereKey($application->id)->lockForUpdate()->firstOrFail();
 
-        return $application->fresh(['program', 'guidanceUser']);
+            if ($lockedApplication->interview_form_submitted_at) {
+                throw new \Exception('Interview form can only be submitted once.');
+            }
+
+            $slotId = (int) ($data['interview_slot_id'] ?? 0);
+            if ($slotId <= 0) {
+                throw new \Exception('Please select an available interview schedule.');
+            }
+
+            $slot = GuidanceInterviewSlot::whereKey($slotId)->lockForUpdate()->first();
+            if (!$slot || !$slot->is_active || $slot->interview_date->isPast()) {
+                throw new \Exception('Selected interview schedule is no longer available.');
+            }
+
+            $isOccupied = Application::where('interview_slot_id', $slot->id)
+                ->where('id', '!=', $application->id)
+                ->exists();
+
+            if ($isOccupied) {
+                throw new \Exception('Selected interview schedule is already occupied. Please choose another slot.');
+            }
+
+            unset($data['interview_slot_id']);
+
+            $lockedApplication->update(array_merge($data, [
+                'interview_slot_id' => $slot->id,
+                'interview_date' => $slot->interview_date,
+                'workflow_stage' => Application::WORKFLOW_INTERVIEW_FORM_SUBMITTED,
+                'interview_form_submitted_at' => now(),
+                'is_active' => true,
+            ]));
+
+            return $lockedApplication->fresh(['program', 'guidanceUser', 'interviewSlot']);
+        });
     }
 
     /**
@@ -185,7 +218,11 @@ class AdmissionService
             throw new \Exception('Only scheduled or completed interview cases can be evaluated.');
         }
 
-        if (!in_array($result, [Application::INTERVIEW_RESULT_PASSED, Application::INTERVIEW_RESULT_FAILED], true)) {
+        if (!in_array($result, [
+            Application::INTERVIEW_RESULT_PASSED,
+            Application::INTERVIEW_RESULT_FAILED,
+            Application::INTERVIEW_RESULT_CONSIDERED,
+        ], true)) {
             throw new \Exception('Invalid interview result.');
         }
 
@@ -218,6 +255,14 @@ class AdmissionService
             }
 
             $application->update($attributes);
+
+            if ($application->interview_slot_id) {
+                GuidanceInterviewSlot::whereKey($application->interview_slot_id)->update([
+                    'is_active' => false,
+                    'deactivated_at' => now(),
+                    'deactivation_reason' => 'completed',
+                ]);
+            }
 
             return $application->fresh(['program', 'guidanceUser', 'interviewEvaluator']);
         });

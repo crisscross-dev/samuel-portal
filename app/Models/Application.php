@@ -25,6 +25,7 @@ class Application extends Model
     public const EXAM_RESULT_FAILED = 'failed';
     public const INTERVIEW_RESULT_PASSED = 'passed';
     public const INTERVIEW_RESULT_FAILED = 'failed';
+    public const INTERVIEW_RESULT_CONSIDERED = 'considered';
     public const ACCOUNT_STATUS_PENDING = 'pending';
     public const ACCOUNT_STATUS_RELEASED = 'released';
 
@@ -66,6 +67,7 @@ class Application extends Model
         'exam_result_recorded_at',
         'forwarded_to_guidance_at',
         'interview_date',
+        'interview_slot_id',
         'guidance_user_id',
         'interview_form_token',
         'interview_form_sent_at',
@@ -138,6 +140,11 @@ class Application extends Model
     public function guidanceUser(): BelongsTo
     {
         return $this->belongsTo(User::class, 'guidance_user_id');
+    }
+
+    public function interviewSlot(): BelongsTo
+    {
+        return $this->belongsTo(GuidanceInterviewSlot::class, 'interview_slot_id');
     }
 
     public function interviewEvaluator(): BelongsTo
@@ -246,10 +253,8 @@ class Application extends Model
 
     public function isReadyForInterviewEvaluation(): bool
     {
-        return in_array($this->workflow_stage, [
-            self::WORKFLOW_INTERVIEW_SCHEDULED,
-            self::WORKFLOW_INTERVIEW_FORM_SUBMITTED,
-        ], true) && !$this->is_archived;
+        return $this->workflow_stage === self::WORKFLOW_INTERVIEW_FORM_SUBMITTED
+            && !$this->is_archived;
     }
 
     public function isInRegistrarRequirements(): bool
@@ -277,6 +282,7 @@ class Application extends Model
         return in_array($this->workflow_stage, [
             self::WORKFLOW_GUIDANCE_REVIEW,
             self::WORKFLOW_INTERVIEW_SCHEDULED,
+            self::WORKFLOW_INTERVIEW_FORM_SUBMITTED,
         ], true) && $this->isActiveRecord();
     }
 
@@ -337,6 +343,7 @@ class Application extends Model
         return match ($this->interview_result) {
             self::INTERVIEW_RESULT_PASSED => 'Passed',
             self::INTERVIEW_RESULT_FAILED => 'Failed',
+            self::INTERVIEW_RESULT_CONSIDERED => 'Considered',
             default => 'Pending',
         };
     }

@@ -26,7 +26,7 @@
                 <div class="clinic-logo">
                     <img src="{{ asset('images/scc_logo.png') }}" alt="SCC Logo" width="75" height="75">
                 </div>
-                <h1>Samuel Christian College General Trias Inc.</h1>
+                <h1>Samuel Christian College of General Trias Inc.</h1>
                 <p>School Management System</p>
                 <p>Secure access to academic records, enrollment, grades, and school administration.</p>
             </div>

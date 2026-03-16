@@ -9,7 +9,6 @@
                 <label class="form-label small fw-semibold">Workflow Stage</label>
                 <select name="workflow_stage" class="form-select form-select-sm">
                     <option value="">All Stages</option>
-                    <option value="interview_scheduled" {{ request('workflow_stage') === 'interview_scheduled' ? 'selected' : '' }}>Interview Scheduled</option>
                     <option value="interview_form_submitted" {{ request('workflow_stage') === 'interview_form_submitted' ? 'selected' : '' }}>Interview Form Submitted</option>
                 </select>
             </div>
@@ -49,8 +48,14 @@
                             <div class="fw-semibold">{{ $application->fullName() }}</div>
                             <div class="text-muted small">{{ $application->email }}</div>
                         </td>
-                        <td>{{ $application->program->code ?? 'N/A' }}</td>
-                        <td>{{ $application->interview_date?->format('M d, Y') ?: 'Not scheduled' }}</td>
+                        <td>
+                            {{ $application->program->code ?? 'N/A' }}
+                            @php
+                            $isShs = str_starts_with(strtoupper((string) optional($application->program)->code), 'SHS-');
+                            @endphp
+                            <span class="badge bg-{{ $isShs ? 'info' : 'primary' }} ms-1">{{ $isShs ? 'SHS' : 'JHS' }}</span>
+                        </td>
+                        <td>{{ $application->interviewSlot?->interview_date?->format('M d, Y') ?: $application->interview_date?->format('M d, Y') ?: 'Not selected yet' }}</td>
                         <td>{{ $application->interview_form_submitted_at ? 'Submitted' : 'Awaiting applicant' }}</td>
                         <td>{{ $application->workflowLabel() }}</td>
                         <td>{{ $application->interview_remarks ?: $application->guidance_remarks ?: 'No remarks yet' }}</td>

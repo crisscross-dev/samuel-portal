@@ -25,11 +25,11 @@
                             <h2 style="color:#1c6abb; text-align:center; margin-top:0;">Guidance Interview Schedule</h2>
 
                             <p>Hi <strong style="color:#000;">{{ $application->fullName() }}</strong>,</p>
-                            <p>You passed the entrance examination and your admission record has been forwarded to the Guidance Office. Your interview is scheduled on <strong>{{ $application->interview_date?->format('F d, Y') }}</strong>.</p>
+                            <p>You passed the entrance examination and your admission record has been forwarded to the Guidance Office. Please complete your guidance form and choose your preferred interview slot from the available schedules.</p>
 
                             <div style="background:#f7fbff; border:1px solid #d9e7f5; border-radius:10px; padding:16px; margin:18px 0;">
                                 <div style="font-size:13px; color:#4a5a6a; font-weight:600; margin-bottom:8px;">Before the Interview</div>
-                                <p style="font-size:14px; color:#485867; margin:0;">Please complete the guidance form before your interview schedule.</p>
+                                <p style="font-size:14px; color:#485867; margin:0;">You will select your interview schedule while submitting the guidance form.</p>
                             </div>
 
                             <div style="text-align:center; margin:30px 0;">

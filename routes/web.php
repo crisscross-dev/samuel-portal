@@ -15,6 +15,7 @@ use App\Http\Controllers\Faculty\GradeController;
 use App\Http\Controllers\Faculty\SectionController as FacultySectionController;
 use App\Http\Controllers\Guidance\ApplicationController as GuidanceApplicationController;
 use App\Http\Controllers\Guidance\DashboardController as GuidanceDashboard;
+use App\Http\Controllers\Guidance\SchedulerController as GuidanceScheduler;
 use App\Http\Controllers\Registrar\ApplicationController;
 use App\Http\Controllers\Registrar\DashboardController as RegistrarDashboard;
 use App\Http\Controllers\Registrar\EnrollmentController;
@@ -193,6 +194,11 @@ Route::prefix('guidance')
     ->middleware(['auth', 'role:guidance'])
     ->group(function () {
         Route::get('/dashboard', [GuidanceDashboard::class, 'index'])->name('dashboard');
+        Route::get('/scheduler', [GuidanceScheduler::class, 'index'])->name('scheduler.index');
+        Route::get('/scheduler/logs', [GuidanceScheduler::class, 'logs'])->name('scheduler.logs');
+        Route::post('/scheduler/interview-slots', [GuidanceScheduler::class, 'store'])->name('interview-slots.store');
+        Route::patch('/scheduler/interview-slots/{slot}/toggle', [GuidanceScheduler::class, 'toggle'])->name('interview-slots.toggle');
+        Route::delete('/scheduler/interview-slots/{slot}', [GuidanceScheduler::class, 'destroy'])->name('interview-slots.destroy');
         Route::get('/applications', [GuidanceApplicationController::class, 'index'])->name('applications.index');
         Route::get('/applications/results', [GuidanceApplicationController::class, 'results'])->name('applications.results');
         Route::get('/applications/logs', [GuidanceApplicationController::class, 'logs'])->name('applications.logs');

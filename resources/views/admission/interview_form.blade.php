@@ -24,12 +24,13 @@
     $form = $application->interview_form_data ?? [];
     $isShs = ($formType ?? 'jhs') === 'shs';
     $isGrade12 = (int) $application->year_level === 12;
+    $alreadySubmitted = (bool) $application->interview_form_submitted_at;
     @endphp
     <div class="container form-shell">
         <div class="card shadow-lg border-0">
             <div class="card-header bg-white py-4">
                 <h3 class="mb-1">{{ $isShs ? 'SHS' : 'JHS' }} Guidance Form</h3>
-                <p class="text-muted mb-0">Complete the remaining details before your scheduled interview on {{ $application->interview_date?->format('F d, Y') ?: 'the assigned date' }}.</p>
+                <p class="text-muted mb-0">Complete the remaining details and choose your preferred interview schedule from available slots.</p>
             </div>
             <div class="card-body p-4 p-lg-5">
                 @if(session('success'))
@@ -45,8 +46,33 @@
                     Admission information is pre-filled from your application so you do not need to retype it.
                 </div>
 
+                @if($alreadySubmitted)
+                <div class="alert alert-success mb-0">This form has already been submitted. Your selected interview schedule is now locked.</div>
+                @else
                 <form method="POST" action="{{ route('admission.interview-form.submit', $application->interview_form_token) }}">
                     @csrf
+
+                    <h6 class="fw-bold mb-3">Interview Schedule Selection</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Available Interview Slots <span class="text-danger">*</span></label>
+                            @if(($availableSlots ?? collect())->isEmpty())
+                            <div class="alert alert-warning mb-0">No available interview slots at the moment. Please wait for Guidance to open new schedules.</div>
+                            @else
+                            <select name="interview_slot_id" class="form-select" required>
+                                <option value="">Select available slot</option>
+                                @foreach($availableSlots as $slot)
+                                @php
+                                $labelType = strtoupper($slot->form_type);
+                                @endphp
+                                <option value="{{ $slot->id }}" {{ (string) old('interview_slot_id') === (string) $slot->id ? 'selected' : '' }}>
+                                    {{ $labelType }} - {{ $slot->interview_date->format('M d, Y') }} ({{ \Illuminate\Support\Carbon::parse($slot->start_time)->format('h:i A') }} - {{ \Illuminate\Support\Carbon::parse($slot->end_time)->format('h:i A') }})
+                                </option>
+                                @endforeach
+                            </select>
+                            @endif
+                        </div>
+                    </div>
 
                     <h6 class="fw-bold mb-3">Enrollment Details</h6>
                     <div class="row g-3 mb-4">
@@ -149,8 +175,9 @@
                     </div>
                     @endif
 
-                    <div class="mt-4 d-flex justify-content-end"><button type="submit" class="btn btn-primary px-4">Submit Form</button></div>
+                    <div class="mt-4 d-flex justify-content-end"><button type="submit" class="btn btn-primary px-4" {{ ($availableSlots ?? collect())->isEmpty() ? 'disabled' : '' }}>Submit Form</button></div>
                 </form>
+                @endif
             </div>
         </div>
     </div>

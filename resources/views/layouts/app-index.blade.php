@@ -169,7 +169,7 @@
             <div class="clinic-logo">
                 <img src="{{ asset('images/scc_logo.png') }}" alt="SCC Logo" />
             </div>
-            <h1>Samuel Christian College General Trias Inc.</h1>
+            <h1>Samuel Christian College General of Trias Inc.</h1>
             <!-- <h2>Student Portal</h2>
             <br>
             <p>School Management System</p>
@@ -295,7 +295,7 @@
         </div>
 
         <div class="scc-footer-bottom">
-            <span>Blessed day! &nbsp;|&nbsp; Thank you and God bless! &nbsp;|&nbsp; &copy; {{ date('Y') }} Samuel Christian College General Trias Inc. All rights reserved.</span>
+            <span>Blessed day! &nbsp;|&nbsp; Thank you and God bless! &nbsp;|&nbsp; &copy; {{ date('Y') }} Samuel Christian College of General Trias Inc. All rights reserved.</span>
         </div>
     </footer>
     @endunless

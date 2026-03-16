@@ -30,7 +30,13 @@
                             </tr>
                             <tr>
                                 <td class="text-muted">Program</td>
-                                <td>{{ $application->program->name ?? 'N/A' }}</td>
+                                <td>
+                                    {{ $application->program->name ?? 'N/A' }}
+                                    @php
+                                    $isShsTrack = str_starts_with(strtoupper((string) optional($application->program)->code), 'SHS-');
+                                    @endphp
+                                    <span class="badge bg-{{ $isShsTrack ? 'info' : 'primary' }} ms-1">{{ $isShsTrack ? 'SHS' : 'JHS' }}</span>
+                                </td>
                             </tr>
                             <tr>
                                 <td class="text-muted">Year Level</td>
@@ -54,7 +60,17 @@
                             </tr>
                             <tr>
                                 <td class="text-muted">Interview Date</td>
-                                <td>{{ $application->interview_date?->format('F d, Y') ?: 'Not scheduled' }}</td>
+                                <td>{{ $application->interviewSlot?->interview_date?->format('F d, Y') ?: $application->interview_date?->format('F d, Y') ?: 'Not selected yet' }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Interview Slot</td>
+                                <td>
+                                    @if($application->interviewSlot)
+                                    {{ \Illuminate\Support\Carbon::parse($application->interviewSlot->start_time)->format('h:i A') }} - {{ \Illuminate\Support\Carbon::parse($application->interviewSlot->end_time)->format('h:i A') }}
+                                    @else
+                                    Not selected yet
+                                    @endif
+                                </td>
                             </tr>
                             <tr>
                                 <td class="text-muted">Form Link Sent</td>
@@ -125,26 +141,25 @@
     <div class="col-lg-5">
         <div class="card mb-3">
             <div class="card-header">
-                <h6 class="mb-0">Schedule Interview</h6>
+                <h6 class="mb-0">Send Interview Form Link</h6>
             </div>
             <div class="card-body">
                 @if($application->canScheduleInterview())
                 <form method="POST" action="{{ route('guidance.applications.schedule-interview', $application) }}" class="d-grid gap-3">
                     @csrf
                     @method('PATCH')
-                    <div>
-                        <label class="form-label fw-semibold">Interview Date</label>
-                        <input type="date" name="interview_date" class="form-control" value="{{ old('interview_date', $application->interview_date?->toDateString()) }}" min="{{ now()->toDateString() }}" required>
+                    <div class="alert alert-info mb-0 small">
+                        Applicants stay in the queue after receiving the form link. They will choose an available schedule slot when submitting their form.
                     </div>
                     <div>
                         <label class="form-label fw-semibold">Guidance Remarks</label>
                         <textarea name="guidance_remarks" class="form-control" rows="4" placeholder="Optional notes for the applicant or internal tracking">{{ old('guidance_remarks', $application->guidance_remarks) }}</textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary">Save Schedule and Send Form Link</button>
+                    <button type="submit" class="btn btn-primary">Send Form Link</button>
                 </form>
                 @else
                 <div class="alert alert-secondary mb-0 small">
-                    Interview scheduling is locked for this workflow stage.
+                    Form link sending is locked for this workflow stage.
                 </div>
                 @endif
             </div>
@@ -156,10 +171,10 @@
             </div>
             <div class="card-body">
                 @if($application->interviewFormUrl())
-                <div class="small text-muted mb-2">This link is emailed automatically after scheduling.</div>
+                <div class="small text-muted mb-2">This link is emailed automatically after you send the form link.</div>
                 <input type="text" class="form-control form-control-sm" readonly value="{{ $application->interviewFormUrl() }}">
                 @else
-                <div class="text-muted small">Schedule the interview first to generate the applicant form link.</div>
+                <div class="text-muted small">Send the form link first to generate the applicant link.</div>
                 @endif
             </div>
         </div>
@@ -178,6 +193,7 @@
                         <select name="interview_result" class="form-select" required>
                             <option value="">Select result</option>
                             <option value="passed" {{ old('interview_result', $application->interview_result) === 'passed' ? 'selected' : '' }}>Passed</option>
+                            <option value="considered" {{ old('interview_result', $application->interview_result) === 'considered' ? 'selected' : '' }}>Considered</option>
                             <option value="failed" {{ old('interview_result', $application->interview_result) === 'failed' ? 'selected' : '' }}>Failed</option>
                         </select>
                     </div>

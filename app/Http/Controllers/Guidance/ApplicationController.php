@@ -18,7 +18,7 @@ class ApplicationController extends Controller
 
     public function index(Request $request): View
     {
-        $query = Application::with('program', 'guidanceUser')
+        $query = Application::with('program', 'guidanceUser', 'interviewSlot')
             ->where('workflow_stage', Application::WORKFLOW_GUIDANCE_REVIEW);
 
         if ($request->filled('search')) {
@@ -37,11 +37,8 @@ class ApplicationController extends Controller
 
     public function results(Request $request): View
     {
-        $query = Application::with('program', 'guidanceUser', 'interviewEvaluator')
-            ->whereIn('workflow_stage', [
-                Application::WORKFLOW_INTERVIEW_SCHEDULED,
-                Application::WORKFLOW_INTERVIEW_FORM_SUBMITTED,
-            ])
+        $query = Application::with('program', 'guidanceUser', 'interviewEvaluator', 'interviewSlot')
+            ->where('workflow_stage', Application::WORKFLOW_INTERVIEW_FORM_SUBMITTED)
             ->whereNull('interview_result');
 
         if ($request->filled('workflow_stage')) {
@@ -64,7 +61,7 @@ class ApplicationController extends Controller
 
     public function logs(Request $request): View
     {
-        $query = Application::with('program', 'guidanceUser', 'interviewEvaluator')
+        $query = Application::with('program', 'guidanceUser', 'interviewEvaluator', 'interviewSlot')
             ->whereNotNull('interview_result')
             ->whereIn('workflow_stage', [
                 Application::WORKFLOW_REGISTRAR_REQUIREMENTS,
@@ -74,7 +71,14 @@ class ApplicationController extends Controller
             ]);
 
         if ($request->filled('interview_result')) {
-            $query->where('interview_result', $request->interview_result);
+            $result = $request->string('interview_result')->toString();
+            if (in_array($result, [
+                Application::INTERVIEW_RESULT_PASSED,
+                Application::INTERVIEW_RESULT_CONSIDERED,
+                Application::INTERVIEW_RESULT_FAILED,
+            ], true)) {
+                $query->where('interview_result', $result);
+            }
         }
 
         if ($request->filled('workflow_stage')) {
@@ -107,7 +111,7 @@ class ApplicationController extends Controller
             Application::WORKFLOW_ARCHIVED,
         ], true), 404);
 
-        $application->load('program', 'reviewer', 'examReviewer', 'guidanceUser', 'interviewEvaluator', 'examSchedule');
+        $application->load('program', 'reviewer', 'examReviewer', 'guidanceUser', 'interviewEvaluator', 'examSchedule', 'interviewSlot');
 
         return view('guidance.applications.show', compact('application'));
     }
@@ -115,7 +119,6 @@ class ApplicationController extends Controller
     public function scheduleInterview(Request $request, Application $application): RedirectResponse
     {
         $request->validate([
-            'interview_date' => ['required', 'date', 'after_or_equal:today'],
             'guidance_remarks' => ['nullable', 'string', 'max:2000'],
         ]);
 
@@ -123,13 +126,12 @@ class ApplicationController extends Controller
             $this->admissionService->scheduleInterview(
                 $application,
                 Auth::id(),
-                $request->date('interview_date')->toDateString(),
                 $request->input('guidance_remarks')
             );
 
             return redirect()
-                ->route('guidance.applications.results')
-                ->with('success', 'Interview scheduled and form link emailed to the applicant.');
+                ->route('guidance.applications.index')
+                ->with('success', 'Form link sent. Applicant remains in queue until they submit the form.');
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }
@@ -138,7 +140,7 @@ class ApplicationController extends Controller
     public function evaluateInterview(Request $request, Application $application): RedirectResponse
     {
         $request->validate([
-            'interview_result' => ['required', 'in:passed,failed'],
+            'interview_result' => ['required', 'in:passed,failed,considered'],
             'interview_remarks' => ['nullable', 'string', 'max:2000'],
         ]);
 
@@ -150,9 +152,11 @@ class ApplicationController extends Controller
                 $request->input('interview_remarks')
             );
 
-            $message = $updated->interview_result === Application::INTERVIEW_RESULT_PASSED
-                ? 'Applicant passed the interview and was returned to the Registrar for requirements verification.'
-                : 'Applicant failed the interview and the record has been archived.';
+            $message = match ($updated->interview_result) {
+                Application::INTERVIEW_RESULT_PASSED => 'Applicant passed the interview and was returned to the Registrar for requirements verification.',
+                Application::INTERVIEW_RESULT_CONSIDERED => 'Applicant was marked as considered and was returned to the Registrar for continued processing.',
+                default => 'Applicant failed the interview and the record has been archived.',
+            };
 
             return redirect()
                 ->route('guidance.applications.logs')

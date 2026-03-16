@@ -379,7 +379,7 @@
     <hr style="border-color:rgba(255,255,255,0.2); margin-bottom:1.5rem;">
 
     <div class="jhs-image-display">
-        <img src="{{ asset('images/shs_enroll.png') }}" alt="SCC Campus">
+        <img src="{{ asset('images/college_enrollment.png') }}" alt="SCC Campus">
     </div>
 
 

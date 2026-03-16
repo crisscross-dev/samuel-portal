@@ -138,6 +138,15 @@
             </a>
         </div>
 
+        <div class="nav-link {{ request()->routeIs('guidance.scheduler.*') ? 'active' : '' }}">
+            <i class="bi bi-calendar2-week"></i> Scheduling
+        </div>
+        <div class="nav-submenu {{ request()->routeIs('guidance.scheduler.*') ? 'show' : '' }}">
+            <a href="{{ route('guidance.scheduler.index') }}" class="nav-sublink {{ request()->routeIs('guidance.scheduler.index') ? 'active' : '' }}">
+                <i class="bi bi-clock-history"></i> Interview Scheduler
+            </a>
+        </div>
+
         @elseif(auth()->user()->hasRole('student'))
         <div class="nav-section">Student Portal</div>
         <a href="{{ route('student.dashboard') }}" class="nav-link {{ request()->routeIs('student.dashboard') ? 'active' : '' }}">

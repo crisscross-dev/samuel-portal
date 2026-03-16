@@ -18,7 +18,7 @@
 
 <div class="card">
     <div class="card-header">
-        <h6 class="mb-0">Applicants Waiting for Interview Scheduling</h6>
+        <h6 class="mb-0">Applicants in Guidance Queue</h6>
     </div>
     <div class="card-body p-0">
         <div class="table-responsive">
@@ -39,7 +39,13 @@
                             <div class="fw-semibold">{{ $application->fullName() }}</div>
                             <div class="text-muted small">{{ $application->email }}</div>
                         </td>
-                        <td>{{ $application->program->code ?? 'N/A' }}</td>
+                        <td>
+                            {{ $application->program->code ?? 'N/A' }}
+                            @php
+                            $isShs = str_starts_with(strtoupper((string) optional($application->program)->code), 'SHS-');
+                            @endphp
+                            <span class="badge bg-{{ $isShs ? 'info' : 'primary' }} ms-1">{{ $isShs ? 'SHS' : 'JHS' }}</span>
+                        </td>
                         <td>{{ $application->workflowLabel() }}</td>
                         <td>
                             @if($application->interview_form_submitted_at)

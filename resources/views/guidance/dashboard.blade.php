@@ -37,6 +37,18 @@
     </div>
 </div>
 
+<div class="card mb-4">
+    <div class="card-body d-flex flex-wrap align-items-center justify-content-between gap-2">
+        <div>
+            <h6 class="mb-1">Interview Scheduler</h6>
+            <p class="mb-0 text-muted small">Manage available slots and review scheduling history in one dedicated page.</p>
+        </div>
+        <a href="{{ route('guidance.scheduler.index') }}" class="btn btn-primary btn-sm">
+            <i class="bi bi-calendar2-week me-1"></i> Open Scheduler
+        </a>
+    </div>
+</div>
+
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h6 class="mb-0">Recent Guidance Cases</h6>
@@ -65,9 +77,15 @@
                             <div class="fw-semibold">{{ $application->fullName() }}</div>
                             <div class="text-muted small">{{ $application->email }}</div>
                         </td>
-                        <td>{{ $application->program->code ?? 'N/A' }}</td>
+                        <td>
+                            {{ $application->program->code ?? 'N/A' }}
+                            @php
+                            $isShs = str_starts_with(strtoupper((string) optional($application->program)->code), 'SHS-');
+                            @endphp
+                            <span class="badge bg-{{ $isShs ? 'info' : 'primary' }} ms-1">{{ $isShs ? 'SHS' : 'JHS' }}</span>
+                        </td>
                         <td>{{ $application->workflowLabel() }}</td>
-                        <td>{{ $application->interview_date?->format('M d, Y') ?: 'Not scheduled' }}</td>
+                        <td>{{ $application->interviewSlot?->interview_date?->format('M d, Y') ?: $application->interview_date?->format('M d, Y') ?: 'Not selected yet' }}</td>
                         <td class="text-end"><a href="{{ route('guidance.applications.show', $application) }}" class="btn btn-sm btn-outline-primary">View</a></td>
                     </tr>
                     @empty

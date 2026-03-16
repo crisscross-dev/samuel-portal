@@ -10,6 +10,7 @@
                 <select name="interview_result" class="form-select form-select-sm">
                     <option value="">All Results</option>
                     <option value="passed" {{ request('interview_result') === 'passed' ? 'selected' : '' }}>Passed</option>
+                    <option value="considered" {{ request('interview_result') === 'considered' ? 'selected' : '' }}>Considered</option>
                     <option value="failed" {{ request('interview_result') === 'failed' ? 'selected' : '' }}>Failed</option>
                 </select>
             </div>
@@ -59,9 +60,15 @@
                             <div class="fw-semibold">{{ $application->fullName() }}</div>
                             <div class="text-muted small">{{ $application->email }}</div>
                         </td>
-                        <td>{{ $application->program->code ?? 'N/A' }}</td>
                         <td>
-                            <span class="badge bg-{{ $application->interview_result === 'passed' ? 'success' : 'danger' }}">{{ $application->interviewResultLabel() }}</span>
+                            {{ $application->program->code ?? 'N/A' }}
+                            @php
+                            $isShs = str_starts_with(strtoupper((string) optional($application->program)->code), 'SHS-');
+                            @endphp
+                            <span class="badge bg-{{ $isShs ? 'info' : 'primary' }} ms-1">{{ $isShs ? 'SHS' : 'JHS' }}</span>
+                        </td>
+                        <td>
+                            <span class="badge bg-{{ $application->interview_result === 'passed' ? 'success' : ($application->interview_result === 'considered' ? 'warning text-dark' : 'danger') }}">{{ $application->interviewResultLabel() }}</span>
                         </td>
                         <td>{{ $application->workflowLabel() }}</td>
                         <td>{{ $application->interview_evaluated_at?->format('M d, Y h:i A') ?: 'N/A' }}</td>
