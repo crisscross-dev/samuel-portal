@@ -176,7 +176,8 @@
                     </tr>
                     <tr>
                         <td class="text-muted fw-semibold">Admission Fee</td>
-                        <td class="fw-bold text-success fs-5">₱{{ number_format($gcashFee, 2) }}</td>
+                        <td class="fw-bold text-success fs-5">₱50.00</td>
+                        <!-- <td class="fw-bold text-success fs-5">₱{{ number_format($gcashFee, 2) }}</td> -->
                     </tr>
                     <tr>
                         <td class="text-muted fw-semibold">Payment Status</td>
@@ -247,7 +248,7 @@
                 </div>
 
                 {{-- Payment Instructions (full-width below QR) --}}
-                <div class="mb-3 p-3 rounded" style="background:#f8fafc; border:1px solid #e2e8f0;">
+                <!-- <div class="mb-3 p-3 rounded" style="background:#f8fafc; border:1px solid #e2e8f0;">
                     <p class="fw-semibold mb-2" style="color:#0d1f3c;">
                         <i class="fas fa-list-ol me-1"></i> Payment Instructions
                     </p>
@@ -264,7 +265,7 @@
                         <i class="fas fa-triangle-exclamation me-1"></i>
                         After paying, fill in the form below and upload your GCash receipt to complete your application.
                     </div>
-                </div>
+                </div> -->
 
                 <hr class="my-4">
 

@@ -22,8 +22,10 @@ use App\Http\Controllers\Registrar\ExamScheduleController;
 use App\Http\Controllers\Registrar\GradeLevelController;
 use App\Http\Controllers\Registrar\PaymentController;
 use App\Http\Controllers\Registrar\SectionController;
+use App\Http\Controllers\Registrar\StudentAccountController;
 use App\Http\Controllers\Registrar\StudentController;
 use App\Http\Controllers\Registrar\SubjectController;
+use App\Http\Controllers\SidebarBadgeController;
 use App\Http\Controllers\Student\DashboardController as StudentDashboard;
 use App\Http\Controllers\Student\EnrollmentController as StudentEnrollmentController;
 use App\Http\Controllers\Student\GradeController as StudentGradeController;
@@ -58,6 +60,9 @@ Route::get('/contact-us', fn() => view('landingpage.about_us.contact_us'))->name
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
+Route::get('/sidebar/badges', SidebarBadgeController::class)
+    ->middleware('auth')
+    ->name('sidebar.badges');
 
 // ─── Public Admission ─────────────────────────────────────────────
 
@@ -66,6 +71,8 @@ Route::prefix('admission')->name('admission.')->group(function () {
     Route::post('/apply',  [AdmissionController::class, 'store'])->name('store');
     Route::get('/jhs',     [AdmissionController::class, 'jhsForm'])->name('jhs');
     Route::post('/jhs',    [AdmissionController::class, 'storeJhs'])->name('jhs.store');
+    Route::get('/shs',     [AdmissionController::class, 'shsForm'])->name('shs');
+    Route::post('/shs',    [AdmissionController::class, 'storeShs'])->name('shs.store');
     Route::get('/success', [AdmissionController::class, 'success'])->name('success');
     Route::get('/track',   [AdmissionController::class, 'track'])->name('track');
     Route::post('/track',  [AdmissionController::class, 'trackSearch'])->name('track.search');
@@ -120,13 +127,14 @@ Route::prefix('admin')
 
 Route::prefix('registrar')
     ->name('registrar.')
-    ->middleware(['auth', 'role:registrar'])
+    ->middleware(['auth', 'role:registrar,jhs-registrar,shs-registrar'])
     ->group(function () {
         Route::get('/dashboard', [RegistrarDashboard::class, 'index'])->name('dashboard');
 
         // Application management (Admission)
         Route::get('/applications', [ApplicationController::class, 'index'])->name('applications.index');
         Route::get('/applications/{application}', [ApplicationController::class, 'show'])->name('applications.show');
+        Route::get('/applications/{application}/receipt-image', [ApplicationController::class, 'receiptImage'])->name('applications.receipt-image');
         Route::patch('/applications/{application}/approve', [ApplicationController::class, 'approve'])->name('applications.approve');
         Route::patch('/applications/{application}/reject', [ApplicationController::class, 'reject'])->name('applications.reject');
         Route::patch('/applications/{application}/exam-result', [ApplicationController::class, 'recordExamResult'])->name('applications.exam-result');
@@ -156,6 +164,10 @@ Route::prefix('registrar')
         // Enrollment management
         Route::resource('enrollments', EnrollmentController::class)->except(['edit', 'update']);
         Route::post('/enrollments/{enrollment}/finalize', [EnrollmentController::class, 'finalize'])->name('enrollments.finalize');
+
+        // Student account release management
+        Route::get('/student-accounts', [StudentAccountController::class, 'index'])->name('student-accounts.index');
+        Route::patch('/student-accounts/{application}/release', [StudentAccountController::class, 'release'])->name('student-accounts.release');
 
         // Payment logs
         Route::get('/payments/logs', [PaymentController::class, 'logs'])->name('payments.logs');

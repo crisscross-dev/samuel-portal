@@ -57,7 +57,7 @@ class LoginController extends Controller
             return redirect()->route('admin.dashboard');
         }
 
-        if ($user->hasRole('registrar')) {
+        if ($user->hasAnyRole(['registrar', 'jhs-registrar', 'shs-registrar'])) {
             return redirect()->route('registrar.dashboard');
         }
 

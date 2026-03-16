@@ -12,13 +12,13 @@ class FacultyPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasAnyRole(['admin', 'registrar']);
+        return $user->hasAnyRole(['admin', 'registrar', 'jhs-registrar', 'shs-registrar']);
     }
 
     public function view(User $user, Faculty $faculty): bool
     {
         // Admin & registrar can view any faculty
-        if ($user->hasAnyRole(['admin', 'registrar'])) return true;
+        if ($user->hasAnyRole(['admin', 'registrar', 'jhs-registrar', 'shs-registrar'])) return true;
 
         // Faculty can view their own profile
         if ($user->hasRole('faculty') && $user->faculty) {

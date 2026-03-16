@@ -6,18 +6,33 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Registrar\StoreStudentRequest;
 use App\Http\Requests\Registrar\UpdateStudentRequest;
 use App\Models\Program;
-use App\Models\Role;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
 
 class StudentController extends Controller
 {
     public function index(Request $request): View
     {
-        $query = Student::with(['user', 'program']);
+        $query = Student::with(['user', 'program'])
+            ->whereHas('user', function ($userQuery) {
+                $userQuery->where('is_active', true)
+                    ->whereHas('roles', fn($roleQuery) => $roleQuery->where('slug', 'student'));
+            });
+
+        if (Schema::hasColumn('applications', 'account_status')) {
+            $query->whereHas('user', function ($userQuery) {
+                $userQuery->whereExists(function ($existsQuery) {
+                    $existsQuery->selectRaw('1')
+                        ->from('applications')
+                        ->whereColumn('applications.email', 'users.email')
+                        ->where('applications.account_status', 'released');
+                });
+            });
+        }
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
@@ -31,10 +46,12 @@ class StudentController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('student_id', 'like', "%{$search}%")
-                  ->orWhereHas('user', fn ($u) =>
-                      $u->where('name', 'like', "%{$search}%")
-                        ->orWhere('email', 'like', "%{$search}%")
-                  );
+                    ->orWhereHas(
+                        'user',
+                        fn($u) =>
+                        $u->where('name', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%")
+                    );
             });
         }
 
@@ -104,9 +121,16 @@ class StudentController extends Controller
 
         // Update student record
         $student->update($request->only([
-            'student_id', 'program_id', 'year_level', 'status',
-            'date_of_birth', 'gender', 'address', 'contact_number',
-            'guardian_name', 'guardian_contact',
+            'student_id',
+            'program_id',
+            'year_level',
+            'status',
+            'date_of_birth',
+            'gender',
+            'address',
+            'contact_number',
+            'guardian_name',
+            'guardian_contact',
         ]));
 
         return redirect()->route('registrar.students.index')

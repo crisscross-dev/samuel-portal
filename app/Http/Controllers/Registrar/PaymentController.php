@@ -113,6 +113,7 @@ class PaymentController extends Controller
     public function store(StorePaymentRequest $request): RedirectResponse
     {
         $enrollment = Enrollment::findOrFail($request->enrollment_id);
+        $isCashierRoute = $this->routeBase() === 'cashier.';
 
         if ((float) $enrollment->total_amount <= 0 || $enrollment->status === 'pending') {
             $this->assessmentService->generateAssessment($enrollment);
@@ -125,12 +126,16 @@ class PaymentController extends Controller
             'payment_date'     => $request->payment_date,
             'payment_method'   => $request->payment_method,
             'reference_number' => $request->reference_number,
-            'status'           => 'pending',
+            'status'           => $isCashierRoute ? 'verified' : 'pending',
+            'verified_by'      => $isCashierRoute ? Auth::id() : null,
+            'verified_at'      => $isCashierRoute ? now() : null,
             'remarks'          => $request->remarks,
         ]);
 
         return redirect()->route($this->routeBase() . 'payments.index')
-            ->with('success', 'Payment recorded successfully. Awaiting verification.');
+            ->with('success', $isCashierRoute
+                ? 'Payment recorded and verified successfully.'
+                : 'Payment recorded successfully. Awaiting verification.');
     }
 
     /**

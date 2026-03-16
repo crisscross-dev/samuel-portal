@@ -212,7 +212,7 @@
                 @else
                 @php
                 $receiptImageUrl = $application->admissionPayment->receipt_image
-                ? asset('storage/' . ltrim($application->admissionPayment->receipt_image, '/'))
+                ? route('registrar.applications.receipt-image', $application)
                 : null;
                 @endphp
                 <div class="small mb-3">

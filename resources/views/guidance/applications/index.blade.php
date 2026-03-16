@@ -28,6 +28,7 @@
                         <th>Applicant</th>
                         <th>Program</th>
                         <th>Stage</th>
+                        <th>Form</th>
                         <th class="text-end">Action</th>
                     </tr>
                 </thead>
@@ -40,11 +41,18 @@
                         </td>
                         <td>{{ $application->program->code ?? 'N/A' }}</td>
                         <td>{{ $application->workflowLabel() }}</td>
+                        <td>
+                            @if($application->interview_form_submitted_at)
+                            <span class="badge bg-success">Submitted</span>
+                            @else
+                            <span class="badge bg-secondary">Pending</span>
+                            @endif
+                        </td>
                         <td class="text-end"><a href="{{ route('guidance.applications.show', $application) }}" class="btn btn-sm btn-outline-primary">View</a></td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="4" class="text-center text-muted py-4">No guidance applications are waiting for interview scheduling.</td>
+                        <td colspan="5" class="text-center text-muted py-4">No guidance applications are waiting for interview scheduling.</td>
                     </tr>
                     @endforelse
                 </tbody>

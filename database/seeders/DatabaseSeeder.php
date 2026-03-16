@@ -23,6 +23,8 @@ class DatabaseSeeder extends Seeder
         $roles = [
             ['name' => 'Admin',     'slug' => 'admin',     'description' => 'System Administrator'],
             ['name' => 'Registrar', 'slug' => 'registrar', 'description' => 'Registrar Staff'],
+            ['name' => 'JHS Registrar', 'slug' => 'jhs-registrar', 'description' => 'Junior High School Registrar Staff'],
+            ['name' => 'SHS Registrar', 'slug' => 'shs-registrar', 'description' => 'Senior High School Registrar Staff'],
             ['name' => 'Cashier',   'slug' => 'cashier',   'description' => 'Cashier Staff'],
             ['name' => 'Guidance',  'slug' => 'guidance',  'description' => 'Guidance Office'],
             ['name' => 'Faculty',   'slug' => 'faculty',   'description' => 'Faculty Member'],
@@ -54,6 +56,26 @@ class DatabaseSeeder extends Seeder
             ]
         );
         $registrar->assignRole('registrar');
+
+        $jhsRegistrar = User::firstOrCreate(
+            ['email' => 'jhsregistrar@gmail.com'],
+            [
+                'name'      => 'JHS Registrar',
+                'password'  => 'password',
+                'is_active' => true,
+            ]
+        );
+        $jhsRegistrar->assignRole('jhs-registrar');
+
+        $shsRegistrar = User::firstOrCreate(
+            ['email' => 'shsregistrar@gmail.com'],
+            [
+                'name'      => 'SHS Registrar',
+                'password'  => 'password',
+                'is_active' => true,
+            ]
+        );
+        $shsRegistrar->assignRole('shs-registrar');
 
         $cashier = User::firstOrCreate(
             ['email' => 'cashier@gmail.com'],
@@ -163,6 +185,12 @@ class DatabaseSeeder extends Seeder
             ['code' => 'JHS-G8',  'name' => 'Grade 8',  'duration_years' => 1],
             ['code' => 'JHS-G9',  'name' => 'Grade 9',  'duration_years' => 1],
             ['code' => 'JHS-G10', 'name' => 'Grade 10', 'duration_years' => 1],
+            // SHS Elective Courses
+            ['code' => 'SHS-ENGR', 'name' => 'Engineering', 'duration_years' => 2],
+            ['code' => 'SHS-MED',  'name' => 'Medicine', 'duration_years' => 2],
+            ['code' => 'SHS-BUS',  'name' => 'Business', 'duration_years' => 2],
+            ['code' => 'SHS-HUM',  'name' => 'Humanities', 'duration_years' => 2],
+            ['code' => 'SHS-CS',   'name' => 'Computer Studies', 'duration_years' => 2],
             // College
             ['code' => 'BSIT', 'name' => 'Bachelor of Science in Information Technology', 'duration_years' => 4],
             ['code' => 'BSCS', 'name' => 'Bachelor of Science in Computer Science',        'duration_years' => 4],

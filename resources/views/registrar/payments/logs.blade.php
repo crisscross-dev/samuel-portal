@@ -67,7 +67,7 @@
                             @endif
                         </td>
                         <td>
-                            @if($payment->status === 'pending')
+                            @if($routeBase !== 'cashier.' && $payment->status === 'pending')
                             <form action="{{ route($routeBase . 'payments.verify', $payment) }}" method="POST" class="d-inline">
                                 @csrf @method('PATCH')
                                 <button class="btn btn-sm btn-outline-success" title="Verify"><i class="bi bi-check-lg"></i></button>

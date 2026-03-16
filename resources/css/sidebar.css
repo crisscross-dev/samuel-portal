@@ -1,7 +1,7 @@
 /* ─── Sidebar Layout ─────────────────────────────────── */
 :root {
     --sidebar-width: 260px;
-    --primary-color: #1a3a5c;
+    --primary-color: linear-gradient(to bottom right, #1e5799, #207cca);
     --accent-color: #2c7be5;
 }
 
@@ -51,13 +51,19 @@ body {
     color: #fff;
 }
 
+.sidebar .nav-link .sidebar-badge,
+.sidebar .nav-sublink .sidebar-badge {
+    margin-left: auto;
+}
+
 .sidebar .nav-submenu {
     display: grid;
     gap: 0.15rem;
     margin: -0.1rem 0.5rem 0.45rem 2.25rem;
 }
 
-.sidebar .nav-sublink {
+.sidebar .nav-sublink,
+.sidebar .nav-submenu a {
     color: rgba(255, 255, 255, 0.72);
     padding: 0.45rem 0.75rem;
     display: flex;
@@ -70,9 +76,31 @@ body {
 }
 
 .sidebar .nav-sublink:hover,
-.sidebar .nav-sublink.active {
+.sidebar .nav-sublink.active,
+.sidebar .nav-submenu a:hover,
+.sidebar .nav-submenu a.active {
     background: rgba(255, 255, 255, 0.16);
     color: #fff;
+}
+
+.sidebar-badge {
+    min-width: 1.15rem;
+    height: 1.15rem;
+    padding: 0 0.3rem;
+    border-radius: 999px;
+    background: #dc3545;
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.68rem;
+    line-height: 1;
+    font-weight: 700;
+}
+
+/* Fallback in case Bootstrap utility classes are unavailable on host cache. */
+.sidebar .d-none {
+    display: none !important;
 }
 
 .sidebar .nav-section {

@@ -9,6 +9,11 @@
 </div>
 
 <div class="row g-4">
+    @php
+    $form = $application->interview_form_data ?? [];
+    $hasSubmittedForm = !empty($form);
+    $formType = $form['form_type'] ?? (str_starts_with(strtoupper((string) optional($application->program)->code), 'SHS-') ? 'shs' : 'jhs');
+    @endphp
     <div class="col-lg-7">
         <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center">
@@ -82,6 +87,37 @@
                     <div class="col-md-6"><strong>LRN:</strong><br>{{ $application->lrn ?: 'N/A' }}</div>
                     <div class="col-md-6"><strong>Elementary School:</strong><br>{{ $application->elementary_school ?: 'N/A' }}</div>
                 </div>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">Submitted {{ strtoupper($formType) }} Form Details</h6>
+                <span class="badge bg-{{ $hasSubmittedForm ? 'success' : 'secondary' }}">{{ $hasSubmittedForm ? 'Submitted' : 'Not submitted' }}</span>
+            </div>
+            <div class="card-body">
+                @if(!$hasSubmittedForm)
+                <p class="text-muted mb-0">The applicant has not submitted the interview form yet.</p>
+                @else
+                <div class="row g-3 small">
+                    <div class="col-md-4"><strong>Date of Enrollment:</strong><br>{{ $form['date_of_enrollment'] ?? 'N/A' }}</div>
+                    <div class="col-md-4"><strong>Classification:</strong><br>{{ $form['student_classification'] ?? 'N/A' }}</div>
+                    <div class="col-md-4"><strong>Type of Subsidy:</strong><br>{{ $form['type_of_subsidy'] ?? 'N/A' }}</div>
+                    @if($formType === 'jhs')
+                    <div class="col-md-4"><strong>Previous School:</strong><br>{{ $form['previous_school_classification'] ?? 'N/A' }}</div>
+                    <div class="col-md-4"><strong>ESC Grantee:</strong><br>{{ $form['esc_grantee'] ?? 'N/A' }}</div>
+                    <div class="col-md-4"><strong>Preferred Interview Time:</strong><br>{{ $form['preferred_interview_time'] ?? 'N/A' }}</div>
+                    @else
+                    <div class="col-md-4"><strong>Elective Course:</strong><br>{{ $form['elective_course'] ?? 'N/A' }}</div>
+                    <div class="col-md-4"><strong>Strand:</strong><br>{{ $form['strand'] ?? 'N/A' }}</div>
+                    <div class="col-md-4"><strong>Last Year &amp; Section:</strong><br>{{ $form['last_year_section'] ?? 'N/A' }}</div>
+                    @endif
+                    <div class="col-md-6"><strong>Father:</strong><br>{{ $form['father_name'] ?? 'N/A' }} ({{ $form['father_contact'] ?? 'N/A' }})</div>
+                    <div class="col-md-6"><strong>Mother:</strong><br>{{ $form['mother_name'] ?? 'N/A' }} ({{ $form['mother_contact'] ?? 'N/A' }})</div>
+                    <div class="col-md-6"><strong>Place of Birth:</strong><br>{{ $form['place_of_birth'] ?? 'N/A' }}</div>
+                    <div class="col-md-6"><strong>Extension Name:</strong><br>{{ $form['extension_name'] ?? 'N/A' }}</div>
+                </div>
+                @endif
             </div>
         </div>
     </div>

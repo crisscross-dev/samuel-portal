@@ -8,6 +8,7 @@ export default defineConfig({
             input: ['resources/css/app.css', 
                 'resources/css/index.css',
                 'resources/css/login.css',
+                'resources/css/sidebar.css',
                 'resources/css/shared/base.css',
 
                 'resources/js/app.js', 

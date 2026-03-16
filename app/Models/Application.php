@@ -25,6 +25,8 @@ class Application extends Model
     public const EXAM_RESULT_FAILED = 'failed';
     public const INTERVIEW_RESULT_PASSED = 'passed';
     public const INTERVIEW_RESULT_FAILED = 'failed';
+    public const ACCOUNT_STATUS_PENDING = 'pending';
+    public const ACCOUNT_STATUS_RELEASED = 'released';
 
     protected $fillable = [
         'first_name',
@@ -49,6 +51,8 @@ class Application extends Model
         'workflow_stage',
         'exam_result',
         'payment_status',
+        'account_status',
+        'account_released_at',
         'is_active',
         'app_id',
         'exam_schedule',
@@ -66,6 +70,7 @@ class Application extends Model
         'interview_form_token',
         'interview_form_sent_at',
         'interview_form_submitted_at',
+        'interview_form_data',
         'interview_result',
         'interview_remarks',
         'interview_evaluated_by',
@@ -96,8 +101,10 @@ class Application extends Model
             'interview_date' => 'date',
             'interview_form_sent_at' => 'datetime',
             'interview_form_submitted_at' => 'datetime',
+            'interview_form_data' => 'array',
             'interview_evaluated_at' => 'datetime',
             'returned_to_registrar_at' => 'datetime',
+            'account_released_at' => 'datetime',
             'archived_at' => 'datetime',
             'requirements_verified_at' => 'datetime',
             'enrollment_processed_at' => 'datetime',

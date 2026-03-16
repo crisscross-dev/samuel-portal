@@ -63,7 +63,7 @@ class AdmissionPaymentController extends Controller
         ]);
 
         $data['receipt_image'] = $request->file('receipt_image')
-            ->store('admission_receipts', 'public');
+            ->store('admission_receipts', 'local');
 
         $application->admissionPayment()->updateOrCreate(
             ['application_id' => $application->id],

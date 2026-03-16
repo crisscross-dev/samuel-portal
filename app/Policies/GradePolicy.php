@@ -15,7 +15,7 @@ class GradePolicy
      */
     public function view(User $user, Grade $grade): bool
     {
-        if ($user->hasAnyRole(['admin', 'registrar'])) {
+        if ($user->hasAnyRole(['admin', 'registrar', 'jhs-registrar', 'shs-registrar'])) {
             return true;
         }
 
@@ -84,7 +84,7 @@ class GradePolicy
             return false;
         }
 
-        if ($user->hasAnyRole(['admin', 'registrar'])) {
+        if ($user->hasAnyRole(['admin', 'registrar', 'jhs-registrar', 'shs-registrar'])) {
             return true;
         }
 
@@ -105,6 +105,6 @@ class GradePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasAnyRole(['admin', 'registrar', 'faculty', 'student']);
+        return $user->hasAnyRole(['admin', 'registrar', 'jhs-registrar', 'shs-registrar', 'faculty', 'student']);
     }
 }

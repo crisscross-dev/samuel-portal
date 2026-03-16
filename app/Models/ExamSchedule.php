@@ -7,9 +7,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ExamSchedule extends Model
 {
+    public const TYPE_JHS = 'jhs';
+    public const TYPE_SHS = 'shs';
+
     protected $fillable = [
         'exam_date',
         'time_slot',
+        'exam_type',
         'max_capacity',
         'is_active',
     ];
@@ -69,5 +73,10 @@ class ExamSchedule extends Model
             ->withCount('applications')
             ->orderBy('exam_date')
             ->orderBy('time_slot');
+    }
+
+    public function scopeForType($query, string $examType)
+    {
+        return $query->where('exam_type', $examType);
     }
 }

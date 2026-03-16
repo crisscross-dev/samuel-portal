@@ -274,17 +274,13 @@ class AdmissionService
                     'name' => $application->fullName(),
                     'email' => $application->email,
                     'password' => 'password',
-                    'is_active' => true,
+                    'is_active' => false,
                 ]);
             } else {
                 $user->update([
                     'name' => $application->fullName(),
-                    'is_active' => true,
+                    'is_active' => false,
                 ]);
-            }
-
-            if (!$user->hasRole('student')) {
-                $user->assignRole('student');
             }
 
             if ($user->student) {
@@ -341,6 +337,8 @@ class AdmissionService
         return DB::transaction(function () use ($application, $reviewerId, $remarks) {
             $application->update([
                 'workflow_stage' => Application::WORKFLOW_CASHIER_PAYMENT,
+                'account_status' => Application::ACCOUNT_STATUS_PENDING,
+                'account_released_at' => null,
                 'enrollment_processed_by' => $reviewerId,
                 'enrollment_processed_at' => now(),
                 'cashier_forwarded_at' => now(),

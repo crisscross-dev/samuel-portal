@@ -9,7 +9,9 @@ use App\Services\AdmissionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ApplicationController extends Controller
 {
@@ -24,6 +26,11 @@ class ApplicationController extends Controller
     {
         $query = Application::with('program', 'reviewer', 'examReviewer', 'guidanceUser', 'requirementsVerifier', 'enrollmentProcessor', 'admissionPayment');
         $stageGroup = $request->string('stage_group')->toString();
+        $programPrefix = $this->programPrefixForCurrentRegistrar($request->user());
+
+        if ($programPrefix !== null) {
+            $query->whereHas('program', fn($programQuery) => $programQuery->where('code', 'like', $programPrefix . '%'));
+        }
 
         if ($stageGroup !== '') {
             match ($stageGroup) {
@@ -66,15 +73,20 @@ class ApplicationController extends Controller
 
         $programs = \App\Models\Program::where('is_active', true)->get();
 
+        $statsBase = Application::query();
+        if ($programPrefix !== null) {
+            $statsBase->whereHas('program', fn($programQuery) => $programQuery->where('code', 'like', $programPrefix . '%'));
+        }
+
         $stats = [
-            'pending'  => Application::pending()->count(),
-            'exam_approved' => Application::workflowStage(Application::WORKFLOW_EXAM_APPROVED)->count(),
-            'guidance_review' => Application::workflowStage(Application::WORKFLOW_GUIDANCE_REVIEW)->count(),
-            'registrar_requirements' => Application::workflowStage(Application::WORKFLOW_REGISTRAR_REQUIREMENTS)->count(),
-            'enrollment' => Application::workflowStage(Application::WORKFLOW_ENROLLMENT)->count(),
-            'cashier' => Application::workflowStage(Application::WORKFLOW_CASHIER_PAYMENT)->count(),
-            'inactive' => Application::where('is_active', false)->count(),
-            'total'    => Application::count(),
+            'pending'  => (clone $statsBase)->pending()->count(),
+            'exam_approved' => (clone $statsBase)->workflowStage(Application::WORKFLOW_EXAM_APPROVED)->count(),
+            'guidance_review' => (clone $statsBase)->workflowStage(Application::WORKFLOW_GUIDANCE_REVIEW)->count(),
+            'registrar_requirements' => (clone $statsBase)->workflowStage(Application::WORKFLOW_REGISTRAR_REQUIREMENTS)->count(),
+            'enrollment' => (clone $statsBase)->workflowStage(Application::WORKFLOW_ENROLLMENT)->count(),
+            'cashier' => (clone $statsBase)->workflowStage(Application::WORKFLOW_CASHIER_PAYMENT)->count(),
+            'inactive' => (clone $statsBase)->where('is_active', false)->count(),
+            'total' => (clone $statsBase)->count(),
         ];
 
         $stageGroupMeta = [
@@ -106,11 +118,45 @@ class ApplicationController extends Controller
      */
     public function show(Application $application): View
     {
+        $this->ensureApplicationWithinRegistrarScope($application);
+
         $application->load('program', 'reviewer', 'examReviewer', 'guidanceUser', 'interviewEvaluator', 'requirementsVerifier', 'enrollmentProcessor', 'admissionPayment.verifier', 'examSchedule');
 
-        $activeSchedules = ExamSchedule::active()->withCount('applications')->orderBy('exam_date')->orderBy('time_slot')->get();
+        $examType = $this->resolveExamTypeForApplication($application);
+
+        $activeSchedules = ExamSchedule::active()
+            ->forType($examType)
+            ->withCount('applications')
+            ->orderBy('exam_date')
+            ->orderBy('time_slot')
+            ->get();
 
         return view('registrar.applications.show', compact('application', 'activeSchedules'));
+    }
+
+    /**
+     * Serve receipt image through registrar-authenticated route.
+     */
+    public function receiptImage(Application $application): BinaryFileResponse
+    {
+        $this->ensureApplicationWithinRegistrarScope($application);
+
+        $payment = $application->admissionPayment;
+
+        abort_if(!$payment || !$payment->receipt_image, 404);
+
+        $relativePath = ltrim($payment->receipt_image, '/');
+
+        if (Storage::disk('local')->exists($relativePath)) {
+            return response()->file(Storage::disk('local')->path($relativePath));
+        }
+
+        // Backward compatibility for older uploads saved in public disk.
+        if (Storage::disk('public')->exists($relativePath)) {
+            return response()->file(Storage::disk('public')->path($relativePath));
+        }
+
+        abort(404);
     }
 
     /**
@@ -118,6 +164,8 @@ class ApplicationController extends Controller
      */
     public function verifyPayment(Request $request, Application $application): RedirectResponse
     {
+        $this->ensureApplicationWithinRegistrarScope($application);
+
         $payment = $application->admissionPayment;
 
         if (!$payment) {
@@ -144,13 +192,33 @@ class ApplicationController extends Controller
      */
     public function assignSchedule(Request $request, Application $application): RedirectResponse
     {
+        $this->ensureApplicationWithinRegistrarScope($application);
+
         $request->validate([
             'exam_schedule_id' => ['nullable', 'exists:exam_schedules,id'],
         ]);
 
+        if ($request->filled('exam_schedule_id')) {
+            $schedule = ExamSchedule::findOrFail($request->exam_schedule_id);
+            $examType = $this->resolveExamTypeForApplication($application);
+
+            if ($schedule->exam_type !== $examType) {
+                return back()->with('error', 'Selected exam schedule does not match applicant department (JHS/SHS).');
+            }
+        }
+
         $application->update(['exam_schedule_id' => $request->exam_schedule_id ?: null]);
 
         return back()->with('success', 'Exam schedule updated.');
+    }
+
+    private function resolveExamTypeForApplication(Application $application): string
+    {
+        $code = strtoupper((string) optional($application->program)->code);
+
+        return str_starts_with($code, 'SHS-')
+            ? ExamSchedule::TYPE_SHS
+            : ExamSchedule::TYPE_JHS;
     }
 
     /**
@@ -158,6 +226,8 @@ class ApplicationController extends Controller
      */
     public function approve(Request $request, Application $application): RedirectResponse
     {
+        $this->ensureApplicationWithinRegistrarScope($application);
+
         try {
             $this->admissionService->approveForExam(
                 $application,
@@ -177,6 +247,8 @@ class ApplicationController extends Controller
      */
     public function recordExamResult(Request $request, Application $application): RedirectResponse
     {
+        $this->ensureApplicationWithinRegistrarScope($application);
+
         $request->validate([
             'exam_result' => ['required', 'in:passed,failed'],
             'exam_remarks' => ['nullable', 'string', 'max:2000'],
@@ -202,6 +274,8 @@ class ApplicationController extends Controller
 
     public function verifyRequirements(Request $request, Application $application): RedirectResponse
     {
+        $this->ensureApplicationWithinRegistrarScope($application);
+
         $requirements = [
             'pre_enrolment_form_submitted' => $request->boolean('pre_enrolment_form_submitted'),
             'student_health_form_submitted' => $request->boolean('student_health_form_submitted'),
@@ -233,6 +307,8 @@ class ApplicationController extends Controller
 
     public function processEnrollment(Request $request, Application $application): RedirectResponse
     {
+        $this->ensureApplicationWithinRegistrarScope($application);
+
         $request->validate([
             'enrollment_remarks' => ['nullable', 'string', 'max:2000'],
         ]);
@@ -255,6 +331,8 @@ class ApplicationController extends Controller
      */
     public function reject(Request $request, Application $application): RedirectResponse
     {
+        $this->ensureApplicationWithinRegistrarScope($application);
+
         try {
             $this->admissionService->rejectApplication(
                 $application,
@@ -267,5 +345,36 @@ class ApplicationController extends Controller
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }
+    }
+
+    private function programPrefixForCurrentRegistrar($user): ?string
+    {
+        if (!$user) {
+            return null;
+        }
+
+        if ($user->hasRole('jhs-registrar')) {
+            return 'JHS-';
+        }
+
+        if ($user->hasRole('shs-registrar')) {
+            return 'SHS-';
+        }
+
+        return null;
+    }
+
+    private function ensureApplicationWithinRegistrarScope(Application $application): void
+    {
+        $user = request()->user();
+        $programPrefix = $this->programPrefixForCurrentRegistrar($user);
+
+        if ($programPrefix === null) {
+            return;
+        }
+
+        $programCode = strtoupper((string) optional($application->program)->code);
+
+        abort_unless(str_starts_with($programCode, $programPrefix), 403, 'Unauthorized for this registrar department scope.');
     }
 }
